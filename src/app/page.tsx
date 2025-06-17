@@ -24,7 +24,7 @@ export default function HomePage() {
 
         {/* Welcome Text with gradient */}
         <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent mb-3">
-          Welcome to Chatopia
+          Welcome to Whispr
         </h2>
         <p className="text-gray-300/90 text-lg mb-8 px-4">
           Connect with friends and colleagues instantly in dynamic chat rooms
