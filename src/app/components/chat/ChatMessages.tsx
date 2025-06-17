@@ -3,7 +3,7 @@
 
 import React, { useCallback } from "react";
 import Image from "next/image";
-import { Message, User, ContextMenu } from "@/models/types";
+import { Message, User, ContextMenu } from "@/types";
 import ContextMenuComponent from "@/app/components/chat/ContextMenu";
 import { PencilSquareIcon, TrashIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
 
@@ -214,8 +214,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             <Image
               src={msg.senderProfilePicture || "/default-avatar.png"}
               alt={`${msg.sender}'s avatar`}
-              width={24} // Reduced from 30 to 24
-              height={24} // Reduced from 30 to 24
+              width={24}
+              height={24}
               className="rounded-full object-cover mr-2 mt-2 aspect-square flex-shrink-0"
             />
           )}
@@ -319,8 +319,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             <Image
               src={user.profilePicture || "/default-avatar.png"}
               alt="Your avatar"
-              width={24} // Reduced from 30 to 24
-              height={24} // Reduced from 30 to 24
+              width={24}
+              height={24}
               className="rounded-full object-cover ml-2 mt-2 aspect-square flex-shrink-0"
             />
           )}

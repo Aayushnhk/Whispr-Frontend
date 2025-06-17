@@ -1,6 +1,6 @@
 // src/app/components/chat/ContextMenu.tsx
 import React from "react";
-import type { ContextMenu } from "@/models/types";
+import type { ContextMenu } from "@/types";
 import { PencilSquareIcon, TrashIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
 
 interface ContextMenuProps {

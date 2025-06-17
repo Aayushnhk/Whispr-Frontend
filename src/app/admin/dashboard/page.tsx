@@ -54,7 +54,6 @@ export default function AdminDashboardPage() {
       const data = await response.json();
       setUsers(data.users);
     } catch (err: any) {
-      console.error("Error fetching users:", err);
       setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoadingUsers(false);
@@ -112,7 +111,6 @@ export default function AdminDashboardPage() {
       setActionMessage(`Role of user ${userId} changed to ${newRole}.`);
       fetchUsers();
     } catch (err: any) {
-      console.error("Error changing role:", err);
       setError(
         err.message || "An unexpected error occurred while changing role."
       );
@@ -159,7 +157,6 @@ export default function AdminDashboardPage() {
       setActionMessage(`User ${userId} has been ${actionText}ned.`);
       fetchUsers();
     } catch (err: any) {
-      console.error(`Error ${actionText}ning user:`, err);
       setError(
         err.message ||
           `An unexpected error occurred while ${actionText}ning user.`

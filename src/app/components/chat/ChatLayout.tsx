@@ -5,8 +5,8 @@ import ChatSidebar from "./ChatSidebar";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import MessageInput from "./MessageInput";
-import { Message, ContextMenu, User, OnlineUser } from "@/models/types";
-import { IRoom } from "@/models/Room";
+import { Message, ContextMenu, User, OnlineUser } from "@/types";
+import { Room } from "@/types";
 import { Socket as SocketConstructor } from "socket.io-client"; // Import Socket constructor
 import { v4 as uuidv4 } from "uuid";
 import { XCircleIcon } from "@heroicons/react/24/outline";
@@ -79,7 +79,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     position: { x: 0, y: 0 },
   });
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
-  const [rooms, setRooms] = useState<IRoom[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [showAddRoomModal, setShowAddRoomModal] = useState(false);
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomDescription, setNewRoomDescription] = useState("");
@@ -89,7 +89,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
   const [roomCreationError, setRoomCreationError] = useState<string | null>(null);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [showEditRoomModal, setShowEditRoomModal] = useState(false);
-  const [editingRoom, setEditingRoom] = useState<IRoom | null>(null);
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [editRoomName, setEditRoomName] = useState("");
   const [editRoomDescription, setEditRoomDescription] = useState<string | null>("");
   const [editRoomPictureFile, setEditRoomPictureFile] = useState<File | null>(null);
@@ -135,7 +135,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to fetch rooms");
       }
-      const data: IRoom[] = await response.json();
+      const data: Room[] = await response.json();
       setRooms(data);
       console.log("Rooms fetched and state updated with:", data);
     } catch (error: any) {
@@ -259,7 +259,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     }
   };
 
-  const handleOnEditRoomClick = (room: IRoom) => {
+  const handleOnEditRoomClick = (room: Room) => {
     setEditingRoom(room);
     setEditRoomName(room.name);
     setEditRoomDescription(room.description || null);

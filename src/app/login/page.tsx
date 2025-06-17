@@ -38,26 +38,23 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Correctly passing 3 arguments: token, refreshToken, and a userData object
         login(
           data.token,
-          data.refreshToken, // Ensure your API returns this
+          data.refreshToken,
           {
             id: data.user.id,
             firstName: data.user.firstName,
             lastName: data.user.lastName,
             email: data.user.email,
-            profilePicture: data.user.profilePicture || '/default-avatar.png', // Fallback to default
-            role: data.user.role || 'user' // Fallback to 'user'
+            profilePicture: data.user.profilePicture || '/default-avatar.png',
+            role: data.user.role || 'user'
           }
         );
-        // Wait for state to update before redirecting
         setTimeout(() => router.replace('/chat'), 0);
       } else {
         setError(data.message || 'Login failed');
       }
     } catch (err: any) {
-      console.error('Login error:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);

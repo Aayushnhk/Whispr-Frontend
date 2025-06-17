@@ -1,9 +1,8 @@
-// src/app/user/components/chat/MessageInput.tsx
 "use client";
 
 import React, { SetStateAction, useState, useRef } from "react";
 import Image from "next/image";
-import { Message } from "@/models/types";
+import { Message } from "@/types";
 import {
   PaperAirplaneIcon,
   MicrophoneIcon,
@@ -108,7 +107,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
       setIsRecording(true);
       setFileUploadError(null);
     } catch (err) {
-      console.error("Error accessing microphone:", err);
       setFileUploadError("Could not access microphone. Please check permissions.");
     }
   };
@@ -135,7 +133,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
         throw new Error(`Upload failed with status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("Audio uploaded successfully:", result);
       sendMessage();
       setAudioBlob(null);
       setAudioUrl(null);
@@ -143,7 +140,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
       setIsUploadingFile(false);
       setMessageInput("");
     } catch (error) {
-      console.error("Error uploading audio:", error);
       setFileUploadError("Failed to send audio message.");
       setIsUploadingFile(false);
     } finally {

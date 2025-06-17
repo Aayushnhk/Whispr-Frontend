@@ -9,7 +9,7 @@ import useSocket from "@/app/hooks/useSocket";
 import useMessages from "@/app/hooks/useMessages";
 import useAuthRedirect from "@/app/hooks/useAuthRedirect";
 import useOtherUser from "@/app/hooks/useOtherUser";
-import { Message, ContextMenu } from "@/models/types";
+import { Message, ContextMenu } from "@/types";
 
 export default function PrivateChatPage() {
   const { user, isAuthenticated, authLoading, logout } = useAuthRedirect();
@@ -160,6 +160,7 @@ export default function PrivateChatPage() {
         senderProfilePicture: user.profilePicture,
         receiverFirstName: otherUser.firstName,
         receiverLastName: otherUser.lastName,
+        receiver: otherUser.username,
       };
 
       if (selectedFile) {
@@ -327,7 +328,7 @@ export default function PrivateChatPage() {
   );
 
   const handleProfilePictureUpload = useCallback((file: File) => {
-    console.log("Profile picture upload initiated from PrivateChatPage (dummy):", file.name);
+    
   }, []);
 
   const handleContextMenu = useCallback(

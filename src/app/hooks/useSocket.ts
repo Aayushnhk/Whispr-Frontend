@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSocketContext } from '@/context/SocketContext';
-import { Message, User, OnlineUser } from '@/models/types';
-import { Socket } from 'socket.io-client'; // Import Socket type
+import { Message, User, OnlineUser } from '@/types';
+import { Socket } from 'socket.io-client';
 
 interface UseSocketProps {
   user: User | null;
@@ -16,7 +16,7 @@ interface UseSocketProps {
 }
 
 interface UseSocketReturn {
-  socket: typeof Socket | null; // Use typeof Socket for type
+  socket: typeof Socket | null;
   onlineUsers: OnlineUser[];
   typingUsers: string[];
   clearTypingStatus: () => void;
@@ -97,7 +97,6 @@ const useSocket = ({
   const sendTypingStatus = useCallback((isTyping: boolean) => {
     if (!socket || !user) return;
 
-    const fullName = `${user.firstName} ${user.lastName}`;
     if (isPrivateChat && receiverId) {
       if (isTyping) {
         socket.emit('typing', {
@@ -149,7 +148,6 @@ const useSocket = ({
 
   const handleReceiveMessage = useCallback(
     (message: any) => {
-      console.log('Received message:', message);
       const normalizedMessage = normalizeMessage(message);
 
       setMessages((prevMessages) => {
@@ -185,7 +183,6 @@ const useSocket = ({
     }
 
     if (isPrivateChat && receiverId && receiverFirstName && receiverLastName) {
-      console.log("useSocket: Emitting joinPrivateRoom");
       socket.emit(
         'joinPrivateRoom',
         {
@@ -197,7 +194,6 @@ const useSocket = ({
           receiverLastName,
         },
         (response: any) => {
-          console.log('Join private room response:', response);
           if (response.success && user.id) {
             socket.emit('getPrivateMessages', {
               user1Id: user.id,
@@ -207,14 +203,12 @@ const useSocket = ({
         }
       );
     } else if (currentRoom) {
-      console.log("useSocket: Emitting joinRoom");
       socket.emit('joinRoom', currentRoom, user.id, user.firstName, user.lastName);
     }
 
     socket.on('receiveMessage', handleReceiveMessage);
     socket.on('receivePrivateMessage', handleReceiveMessage);
     socket.on('historicalPrivateMessages', (historicalMessages: any[]) => {
-      console.log('Received historical messages:', historicalMessages);
       setMessages(historicalMessages.map(normalizeMessage));
     });
     
@@ -256,11 +250,10 @@ const useSocket = ({
     socket.on('messageDeleted', ({ messageId }: { messageId: string }) =>
       setMessages((prev) => prev.filter((msg) => msg._id !== messageId))
     );
-    socket.on('messageError', (error: string) => console.error('Socket error:', error));
+    socket.on('messageError', (error: string) => {});
 
     return () => {
       if (socket) {
-        console.log('useSocket: Cleaning up listeners.');
         socket.off('receiveMessage', handleReceiveMessage);
         socket.off('receivePrivateMessage', handleReceiveMessage);
         socket.off('historicalPrivateMessages');
@@ -271,13 +264,11 @@ const useSocket = ({
         socket.off('messageError');
 
         if (isPrivateChat && receiverId && user?.id) {
-          console.log("useSocket: Emitting leavePrivateRoom");
           socket.emit('leavePrivateRoom', {
             senderId: user.id,
             receiverId,
           });
         } else if (currentRoom && user?.id) {
-          console.log("useSocket: Emitting leaveRoom");
           socket.emit('leaveRoom', currentRoom, user.id, user.firstName, user.lastName);
         }
         clearTypingStatus();

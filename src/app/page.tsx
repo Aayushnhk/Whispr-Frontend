@@ -3,9 +3,7 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from gray-900 via-gray-900 to-gray-900 text-gray-100 p-4 sm:p-6">
-      {/* Central Card Container with effects */}
       <div className="bg-gray-800/90 backdrop-blur-sm p-8 sm:p-10 rounded-xl shadow-2xl shadow-black/50 max-w-md w-full text-center flex flex-col items-center border border-gray-600 hover:border-blue-500 transition-all duration-500 transform hover:-translate-y-1 hover:scale-[1.01] group/card">
-        {/* Chat Icon/Logo Area with floating animation */}
         <div className="mb-6 animate-float">
           <svg
             className="w-20 h-20 mx-auto text-blue-400 group-hover/card:text-blue-300 transition-colors duration-500"
@@ -22,7 +20,6 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* Welcome Text with gradient */}
         <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent mb-3">
           Welcome to Whispr
         </h2>
@@ -30,7 +27,6 @@ export default function HomePage() {
           Connect with friends and colleagues instantly in dynamic chat rooms
         </p>
 
-        {/* Login Button with effects */}
         <Link href="/login" passHref>
           <button className="w-full flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-blue-500/40 hover:from-blue-500 hover:to-blue-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 text-lg group cursor-pointer">
             <svg
@@ -51,7 +47,6 @@ export default function HomePage() {
           </button>
         </Link>
 
-        {/* OR Separator with animation */}
         <div className="flex items-center w-full my-6">
           <div className="flex-grow border-t border-gray-500/80 transition-all duration-500 group-hover/card:border-blue-500/30"></div>
           <span className="mx-4 text-gray-300/80 text-sm font-medium group-hover/card:text-blue-300 transition-colors duration-500">
@@ -60,7 +55,6 @@ export default function HomePage() {
           <div className="flex-grow border-t border-gray-500/80 transition-all duration-500 group-hover/card:border-blue-500/30"></div>
         </div>
 
-        {/* Create Account Button with effects */}
         <Link href="/register" passHref>
           <button className="w-full flex items-center justify-center px-6 py-3 border border-gray-700 text-blue-400 font-semibold rounded-lg hover:bg-gray-700/50 hover:text-blue-300 hover:border-blue-400/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-gray-800 text-lg group cursor-pointer">
             <svg
@@ -79,7 +73,6 @@ export default function HomePage() {
           </button>
         </Link>
 
-        {/* Footer Text with animation */}
         <p className="text-gray-300/80 text-sm mt-8 animate-pulse hover:animate-none cursor-default">
           Join thousands of users managing their conversations with ChatApp
         </p>

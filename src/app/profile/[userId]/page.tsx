@@ -4,7 +4,7 @@ import React, { useEffect, useState, FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext'; 
+import { useAuth } from '@/context/AuthContext';
 
 interface UserProfile {
   _id: string;
@@ -69,9 +69,7 @@ export default function UnifiedUserProfilePage() {
 
         const data = await response.json();
         setUserProfile(data.user);
-        console.log('UnifiedUserProfilePage: Fetched profile picture URL:', data.user.profilePicture);
       } catch (err: any) {
-        console.error("Error fetching user profile:", err);
         setError(err.message || "Failed to load user profile.");
       } finally {
         setLoading(false);
@@ -153,10 +151,7 @@ export default function UnifiedUserProfilePage() {
       if (userProfile && isCurrentUserProfile) {
         setUserProfile({ ...userProfile, profilePicture: data.messageDetails.fileUrl });
       }
-      console.log('UnifiedUserProfilePage: New profile picture URL after upload:', data.messageDetails.fileUrl);
-      setSelectedFile(null);
     } catch (error: any) {
-      console.error('Error uploading profile picture:', error);
       setUploadError(error.message || 'An unexpected error occurred during upload.');
     } finally {
       setIsUploading(false);

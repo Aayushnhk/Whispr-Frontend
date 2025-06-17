@@ -1,4 +1,3 @@
-// src/app/chat/page.tsx
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
@@ -7,7 +6,7 @@ import ChatLayout from "@/app/components/chat/ChatLayout";
 import useSocket from "@/app/hooks/useSocket";
 import useMessages from "@/app/hooks/useMessages";
 import { useAuth } from "@/context/AuthContext";
-import { User as UserType, OnlineUser, Message } from "@/models/types";
+import { User as UserType, OnlineUser, Message } from "@/types";
 import jwt from "jsonwebtoken";
 
 export default function ChatPage() {
@@ -64,13 +63,11 @@ export default function ChatPage() {
       }
       return true;
     } catch (error) {
-      console.error("Token refresh failed:", error);
       logout();
       return false;
     }
   }, [refreshAuth, logout]);
 
-  // Map rawOnlineUsers to onlineUsersData
   useEffect(() => {
     if (rawOnlineUsers && rawOnlineUsers.length > 0) {
       const formattedUsers = rawOnlineUsers.map((u) => ({
@@ -81,34 +78,21 @@ export default function ChatPage() {
         profilePicture: u.profilePicture || "/default-avatar.png",
       }));
       setOnlineUsersData(formattedUsers);
-      console.log("ChatPage set onlineUsersData:", formattedUsers);
     } else {
       setOnlineUsersData([]);
-      console.log("ChatPage: No rawOnlineUsers, setting onlineUsersData to []");
     }
   }, [rawOnlineUsers]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
-      console.log("ChatPage: Skipping fetch due to missing auth or user", {
-        isAuthenticated,
-        user,
-      });
       return;
     }
-
-    console.log("ChatPage useEffect triggered", {
-      isPrivateChat,
-      receiverIdFromUrl,
-      currentRoom,
-    });
 
     if (isPrivateChat && receiverIdFromUrl && typeof receiverIdFromUrl === "string") {
       const fetchReceiverDetails = async () => {
         try {
           const token = localStorage.getItem("token");
           if (!token) {
-            console.error("No authentication token found.");
             logout();
             return;
           }
@@ -143,7 +127,6 @@ export default function ChatPage() {
           setReceiverLastName(data.user.lastName);
           fetchPrivateMessages(user.id, receiverIdFromUrl);
         } catch (error) {
-          console.error("Error fetching receiver details:", error);
           setReceiverFirstName(null);
           setReceiverLastName(null);
           router.push("/chat");
@@ -207,7 +190,6 @@ export default function ChatPage() {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          console.error("No authentication token found.");
           logout();
           return;
         }
@@ -220,7 +202,6 @@ export default function ChatPage() {
 
         router.push(`/chat/private/${targetUserId}`);
       } catch (error) {
-        console.error("Error starting private conversation:", error);
       }
     },
     [socket, user, router, logout, handleTokenRefresh]

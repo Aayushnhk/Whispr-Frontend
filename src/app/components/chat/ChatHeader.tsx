@@ -1,4 +1,3 @@
-// src/app/components/chat/ChatHeader.tsx
 "use client";
 
 import React from "react";

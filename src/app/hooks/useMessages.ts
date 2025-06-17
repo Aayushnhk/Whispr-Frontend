@@ -1,11 +1,9 @@
-// File: src/app/hooks/useMessages.ts
-
 import { useState, useCallback, useEffect } from "react";
-import { Message } from "@/models/types";
+import { Message } from "@/types";
 
 interface UseMessagesProps {
   isAuthenticated: boolean;
-  user: { id: string; firstName: string; lastName: string; profilePicture?: string } | null; // Added profilePicture to user
+  user: { id: string; firstName: string; lastName: string; profilePicture?: string } | null;
   currentRoom?: string;
   receiverId?: string | null;
 }
@@ -49,9 +47,9 @@ const useMessages = ({
           message.sender?._id?.toString() ||
           message.sender?.toString() ||
           "",
-        senderFirstName: message.senderFirstName || undefined, // ADDED
-        senderLastName: message.senderLastName || undefined,   // ADDED
-        senderProfilePicture: message.senderProfilePicture || undefined, // ADDED THIS LINE
+        senderFirstName: message.senderFirstName || undefined,
+        senderLastName: message.senderLastName || undefined,
+        senderProfilePicture: message.senderProfilePicture || undefined,
         text: message.text || message.content || undefined,
         timestamp:
           message.timestamp || message.createdAt || new Date().toISOString(),
@@ -91,7 +89,6 @@ const useMessages = ({
   const fetchRoomMessages = useCallback(
     async (roomName: string, limit = 50, skip = 0) => {
       if (!isAuthenticated) {
-        console.log("fetchRoomMessages: Not authenticated, skipping fetch");
         return;
       }
       try {
@@ -109,7 +106,6 @@ const useMessages = ({
           throw new Error(`Failed to fetch messages: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("fetchRoomMessages: Fetched messages", data.messages);
         const normalizedMessages = data.messages.map(normalizeMessage);
         setMessages(normalizedMessages);
       } catch (error) {
@@ -127,9 +123,6 @@ const useMessages = ({
       skip = 0
     ) => {
       if (!isAuthenticated || !currentLoggedInUserId || !targetReceiverId) {
-        console.log(
-          "fetchPrivateMessages: Missing auth or user IDs, skipping fetch"
-        );
         return;
       }
       try {
@@ -140,8 +133,6 @@ const useMessages = ({
 
         const url = `/api/messages/private/${targetReceiverId}?limit=${limit}&skip=${skip}`;
 
-        console.log("Fetching private messages from URL:", url);
-
         const response = await fetch(url, {
           headers: {
             "Content-Type": "application/json",
@@ -151,7 +142,6 @@ const useMessages = ({
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error("API Error Response:", errorData);
           throw new Error(
             `Failed to fetch private messages: ${
               errorData.message || response.statusText
@@ -159,7 +149,6 @@ const useMessages = ({
           );
         }
         const data = await response.json();
-        console.log("fetchPrivateMessages: Fetched messages", data.messages);
         const normalizedMessages = data.messages.map(normalizeMessage);
         setMessages(normalizedMessages);
       } catch (error: any) {
@@ -171,17 +160,8 @@ const useMessages = ({
 
   useEffect(() => {
     if (!isAuthenticated || !user?.id) {
-      console.log("useMessages: Skipping fetch due to missing auth or user", {
-        isAuthenticated,
-        user,
-      });
       return;
     }
-    console.log("useMessages: Triggering fetch", {
-      currentRoom,
-      receiverId,
-      userId: user.id,
-    });
     if (currentRoom) {
       fetchRoomMessages(currentRoom);
     } else if (receiverId) {

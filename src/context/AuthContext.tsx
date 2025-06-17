@@ -1,11 +1,9 @@
-// src/context/AuthContext.tsx
 "use client";
 
 import React, { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import jwt from 'jsonwebtoken';
 
-// Define the structure of the user data
 export interface UserAuthData {
     id: string;
     firstName: string;
@@ -15,16 +13,14 @@ export interface UserAuthData {
     role: 'user' | 'admin';
 }
 
-// Define the shape of the AuthContext
 interface AuthContextType {
     token: string | null;
     isAuthenticated: boolean;
     login: (token: string, refreshToken: string, userData: UserAuthData) => void;
     logout: () => void;
     isLoading: boolean;
-    user: UserAuthData | null; // This is the central user object
+    user: UserAuthData | null;
     refreshAuth: () => Promise<boolean>;
-    // Derived properties for convenience (get their values from the 'user' object)
     userId: string | null;
     firstName: string | null;
     lastName: string | null;
@@ -35,9 +31,9 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 1: Corrected children type here
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(null);
-    const [user, setUser] = useState<UserAuthData | null>(null); // Central user state
+    const [user, setUser] = useState<UserAuthData | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
@@ -50,14 +46,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
     }, []);
 
     const clearAuthData = useCallback(() => {
-        console.log("Clearing auth data");
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userData'); // FIX 2: Only remove the single userData item
+        localStorage.removeItem('userData');
         localStorage.removeItem('lastActivity');
 
         setToken(null);
-        setUser(null); // Clear user object
+        setUser(null);
         setIsAuthenticated(false);
     }, []);
 
@@ -86,10 +81,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
                 const data = await response.json();
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('refreshToken', data.refreshToken);
-                // Assuming refresh endpoint might return updated user data
                 if (data.user) {
-                    localStorage.setItem('userData', JSON.stringify(data.user)); // FIX 3: Store updated user data
-                    setUser(data.user); // FIX 4: Update user state
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    setUser(data.user);
                 }
                 setToken(data.token);
                 updateLastActivity();
@@ -99,7 +93,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
                 return false;
             }
         } catch (error) {
-            console.error('Token refresh failed:', error);
             logout();
             return false;
         }
@@ -108,19 +101,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
     const login = useCallback((
         newToken: string,
         newRefreshToken: string,
-        userData: UserAuthData // Expect userData as a single object
+        userData: UserAuthData
     ) => {
-        console.log("Login data received:", { newToken, newRefreshToken, userData });
-        
-        // FIX 5: Removed the problematic sanitizedLastName logic
-
         localStorage.setItem('token', newToken);
         localStorage.setItem('refreshToken', newRefreshToken);
-        localStorage.setItem('userData', JSON.stringify(userData)); // FIX 6: Store user data as JSON string
+        localStorage.setItem('userData', JSON.stringify(userData));
         localStorage.setItem('lastActivity', Date.now().toString());
 
         setToken(newToken);
-        setUser(userData); // FIX 7: Set the user object
+        setUser(userData);
         setIsAuthenticated(true);
         setIsLoading(false);
         router.replace('/chat');
@@ -131,26 +120,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
             try {
                 const storedToken = localStorage.getItem('token');
                 const storedRefreshToken = localStorage.getItem('refreshToken');
-                const storedUserData = localStorage.getItem('userData'); // FIX 8: Get combined user data
+                const storedUserData = localStorage.getItem('userData');
                 const storedLastActivity = localStorage.getItem('lastActivity');
 
                 if (!storedToken || !storedRefreshToken || !storedUserData) {
                     throw new Error('Missing auth data');
                 }
 
-                const parsedUserData: UserAuthData = JSON.parse(storedUserData); // FIX 9: Parse user data
+                const parsedUserData: UserAuthData = JSON.parse(storedUserData);
 
-                // Check token expiration
                 const decoded = jwt.decode(storedToken) as { exp?: number };
                 if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
                     const refreshed = await refreshAuth();
                     if (!refreshed) throw new Error('Token refresh failed');
-                    // If refreshed, refreshAuth would have already updated token and user state,
-                    // so we don't need to do it here again. Just return.
                     return; 
                 }
 
-                // Check inactivity
                 if (storedLastActivity) {
                     const lastActivity = parseInt(storedLastActivity, 10);
                     if (Date.now() - lastActivity > INACTIVITY_TIMEOUT) {
@@ -158,9 +143,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
                     }
                 }
 
-                // All checks passed
                 setToken(storedToken);
-                setUser(parsedUserData); // FIX 10: Set the user object from stored data
+                setUser(parsedUserData);
                 setIsAuthenticated(true);
                 updateLastActivity();
 
@@ -168,7 +152,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
                     router.replace('/chat');
                 }
             } catch (error) {
-                console.error('Auth validation failed:', error);
                 clearAuthData();
                 if (pathname !== '/login' && pathname !== '/') {
                     router.replace('/login');
@@ -190,16 +173,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
         };
     }, [router, pathname, clearAuthData, refreshAuth, updateLastActivity, INACTIVITY_TIMEOUT]);
 
-    // Derive individual user properties from the 'user' object for convenience
     const userId = user?.id || null;
     const firstName = user?.firstName || null;
     const lastName = user?.lastName || null;
     const email = user?.email || null;
     const profilePicture = user?.profilePicture || null;
     const role = user?.role || null;
-
-
-    console.log("AuthContext providing:", { user, isAuthenticated, isLoading, token, userId, firstName, lastName, email, profilePicture, role });
 
     return (
         <AuthContext.Provider
@@ -215,7 +194,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // FIX 
                 login,
                 logout,
                 isLoading,
-                user, // Provide the combined user object
+                user,
                 refreshAuth,
             }}
         >

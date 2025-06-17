@@ -10,7 +10,7 @@ interface OtherUser {
   username: string;
   firstName: string;
   lastName: string;
-  profilePicture?: string; // ADDED THIS LINE
+  profilePicture?: string;
 }
 
 const useOtherUser = ({ userId, currentUserId }: UseOtherUserProps) => {
@@ -52,7 +52,7 @@ const useOtherUser = ({ userId, currentUserId }: UseOtherUserProps) => {
           username: data.user.username || `${data.user.firstName} ${data.user.lastName}`,
           firstName: data.user.firstName,
           lastName: data.user.lastName,
-          profilePicture: data.user.profilePicture, // ADDED THIS LINE
+          profilePicture: data.user.profilePicture,
         });
       } catch (err: any) {
         setError(err.message);

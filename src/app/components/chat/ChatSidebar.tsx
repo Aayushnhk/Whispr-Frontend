@@ -2,8 +2,8 @@
 "use client";
 
 import React from "react";
-import { IRoom } from "@/models/Room";
-import { User, OnlineUser } from "@/models/types";
+import { Room } from "@/types";
+import { User, OnlineUser } from "@/types";
 import Link from "next/link";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import mongoose from "mongoose";
@@ -18,7 +18,7 @@ type PopulatedCreator = {
 };
 
 interface ChatSidebarProps {
-  rooms: IRoom[];
+  rooms: Room[];
   onlineUsers: OnlineUser[];
   currentRoom: string;
   handleRoomChange: (room: string) => void;
@@ -27,7 +27,7 @@ interface ChatSidebarProps {
   user: User;
   className?: string;
   onAddRoomClick: () => void;
-  onEditRoomClick: (room: IRoom) => void;
+  onEditRoomClick: (room: Room) => void;
 }
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({
@@ -42,22 +42,15 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
   onAddRoomClick,
   onEditRoomClick,
 }) => {
-  const { user: authUser } = useAuth(); // Use authUser to avoid naming conflict with props.user
+  const { user: authUser } = useAuth();
   const router = useRouter();
   const currentUserFullName = `${user.firstName} ${user.lastName}`;
 
-  // Log onlineUsers for debugging
-  React.useEffect(() => {
-    console.log("ChatSidebar onlineUsers:", onlineUsers);
-  }, [onlineUsers]);
-
-  // Filter out duplicates and invalid users based on userId
   const uniqueOnlineUsers = Array.from(
     new Map(
       onlineUsers
         .filter((user) => {
           if (!user.userId) {
-            console.warn("Invalid online user with missing userId:", user);
             return false;
           }
           return true;
@@ -65,11 +58,6 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         .map((user) => [user.userId, user])
     ).values()
   );
-
-  // Log uniqueOnlineUsers for debugging
-  React.useEffect(() => {
-    console.log("ChatSidebar uniqueOnlineUsers:", uniqueOnlineUsers);
-  }, [uniqueOnlineUsers]);
 
   return (
     <div
@@ -174,7 +162,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
             {uniqueOnlineUsers.map((onlineUser) => (
               <li
                 key={onlineUser.userId}
-                className="flex items-center justify-between p-2 rounded-lg" // Removed hover:bg-gray-800 transition-colors
+                className="flex items-center justify-between p-2 rounded-lg"
                 onClick={() =>
                   navigateToUserProfile(
                     onlineUser.fullName || `${onlineUser.firstName} ${onlineUser.lastName}`

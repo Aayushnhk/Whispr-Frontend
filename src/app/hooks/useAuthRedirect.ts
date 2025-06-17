@@ -1,8 +1,7 @@
-// src/hooks/useAuthRedirect.ts
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { User } from "@/models/types";
+import { User } from "@/types";
 
 const useAuthRedirect = () => {
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
@@ -13,7 +12,6 @@ const useAuthRedirect = () => {
     if (authLoading) {
       timeoutId = setTimeout(() => {
         if (authLoading && !isAuthenticated) {
-          console.log("Authentication still loading after timeout, redirecting to /login");
           router.replace("/login");
         }
       }, 5000);
