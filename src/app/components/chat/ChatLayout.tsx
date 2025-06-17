@@ -7,7 +7,7 @@ import ChatMessages from "./ChatMessages";
 import MessageInput from "./MessageInput";
 import { Message, ContextMenu, User, OnlineUser } from "@/types";
 import { Room } from "@/types";
-import { Socket as SocketConstructor } from "socket.io-client"; // Import Socket constructor
+import { Socket as SocketConstructor } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 
@@ -28,12 +28,12 @@ interface ChatLayoutProps {
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   onlineUsers: OnlineUser[];
-  typingUsers: string[]; // Changed from Set<string> to string[]
-  startPrivateConversation: (userId: string, fullName: string) => void; // Updated to accept userId and fullName
+  typingUsers: string[];
+  startPrivateConversation: (userId: string, fullName: string) => void;
   navigateToUserProfile: (fullName: string) => void;
   logout: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
-  socket: typeof SocketConstructor | null; // Use typeof SocketConstructor
+  socket: typeof SocketConstructor | null;
   fetchRoomMessages: (roomName: string) => void;
   fetchPrivateMessages: (user1Id: string, user2Id: string) => void;
   handleRoomChange: (roomName: string) => void;
@@ -118,11 +118,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
   };
 
   const fetchRooms = useCallback(async () => {
-    console.log("Fetching rooms...");
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found for fetching rooms.");
         return;
       }
       const response = await fetch("/api/rooms", {
@@ -137,10 +135,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       }
       const data: Room[] = await response.json();
       setRooms(data);
-      console.log("Rooms fetched and state updated with:", data);
-    } catch (error: any) {
-      console.error("Error fetching rooms:", error);
-    }
+    } catch (error: any) {}
   }, []);
 
   useEffect(() => {
@@ -250,7 +245,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       setNewRoomPicturePreview(null);
       if (newRoomFileInputRef.current) newRoomFileInputRef.current.value = "";
     } catch (error: any) {
-      console.error("Error creating room:", error);
       setRoomCreationError(
         error.message || "Failed to create room. Please try again."
       );
@@ -335,7 +329,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       });
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Raw error response text:", errorText);
         try {
           const errorData = JSON.parse(errorText);
           throw new Error(errorData.message || "Failed to update room.");
@@ -346,7 +339,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         }
       }
       const responseData = await response.json();
-      console.log("Successful PUT response data:", responseData);
       await fetchRooms();
       setShowEditRoomModal(false);
       setEditingRoom(null);
@@ -356,7 +348,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       setEditRoomPicturePreview(null);
       if (editRoomFileInputRef.current) editRoomFileInputRef.current.value = "";
     } catch (error: any) {
-      console.error("Error updating room (client-side catch):", error);
       setRoomEditError(
         error.message || "Failed to update room. Please try again."
       );
@@ -527,7 +518,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         }
       }
     } catch (error) {
-      console.error("Error sending message:", error);
       setFileUploadError((error as Error).message || "Failed to send message.");
       setMessages((prev) => prev.filter((msg) => msg.id !== tempMessageId));
     } finally {
@@ -725,7 +715,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
 
   const handleSaveEdit = () => {
     if (!socket || !user || !editingMessageId || !editingMessageText.trim()) {
-      console.warn("Please enter text to save the edit.");
       return;
     }
     socket.emit("editMessage", {
@@ -787,7 +776,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         onlineUsers={onlineUsers}
         currentRoom={currentRoom}
         handleRoomChange={handleRoomChange}
-        startPrivateConversation={startPrivateConversation} // Updated to pass the prop directly
+        startPrivateConversation={startPrivateConversation}
         navigateToUserProfile={navigateToUserProfile}
         user={user}
         className="shadow-lg"
