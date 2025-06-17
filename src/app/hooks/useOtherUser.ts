@@ -1,0 +1,71 @@
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface UseOtherUserProps {
+  userId: string | null;
+  currentUserId: string | null;
+}
+
+interface OtherUser {
+  username: string;
+  firstName: string;
+  lastName: string;
+  profilePicture?: string; // ADDED THIS LINE
+}
+
+const useOtherUser = ({ userId, currentUserId }: UseOtherUserProps) => {
+  const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!userId || !currentUserId) {
+      setError("Invalid user IDs");
+      setLoading(false);
+      return;
+    }
+
+    const fetchOtherUser = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Authentication token not found");
+        }
+
+        const response = await fetch(`/api/user?id=${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch user details");
+        }
+
+        const data = await response.json();
+        setOtherUser({
+          username: data.user.username || `${data.user.firstName} ${data.user.lastName}`,
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          profilePicture: data.user.profilePicture, // ADDED THIS LINE
+        });
+      } catch (err: any) {
+        setError(err.message);
+        router.push("/chat");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOtherUser();
+  }, [userId, currentUserId, router]);
+
+  return { otherUser, loading, error };
+};
+
+export default useOtherUser;
