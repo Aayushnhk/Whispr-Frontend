@@ -7,7 +7,8 @@ import useSocket from "@/app/hooks/useSocket";
 import useMessages from "@/app/hooks/useMessages";
 import { useAuth } from "@/context/AuthContext";
 import { User as UserType, OnlineUser, Message } from "@/types";
-import jwt from "jsonwebtoken";
+// REMOVE: import jwt from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode"; // ADD THIS: Use jwt-decode for client-side decoding
 
 export default function ChatPage() {
   const {
@@ -97,7 +98,8 @@ export default function ChatPage() {
             return;
           }
 
-          const decoded = jwt.decode(token) as { exp?: number };
+          // Use jwtDecode for client-side decoding
+          const decoded = jwtDecode(token) as { exp?: number }; // Changed jwt.decode to jwtDecode
           if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
             const refreshed = await handleTokenRefresh();
             if (!refreshed) return;
@@ -194,7 +196,8 @@ export default function ChatPage() {
           return;
         }
 
-        const decoded = jwt.decode(token) as { exp?: number };
+        // Use jwtDecode for client-side decoding
+        const decoded = jwtDecode(token) as { exp?: number }; // Changed jwt.decode to jwtDecode
         if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
           const refreshed = await handleTokenRefresh();
           if (!refreshed) return;

@@ -2,7 +2,8 @@
 
 import React, { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import jwt from 'jsonwebtoken';
+// REMOVE: import jwt from 'jsonwebtoken';
+import { jwtDecode } from "jwt-decode"; // ADD THIS: Use jwt-decode for client-side decoding
 
 export interface UserAuthData {
     id: string;
@@ -129,7 +130,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 const parsedUserData: UserAuthData = JSON.parse(storedUserData);
 
-                const decoded = jwt.decode(storedToken) as { exp?: number };
+                // Use jwtDecode for client-side decoding
+                const decoded = jwtDecode(storedToken) as { exp?: number }; // Changed jwt.decode to jwtDecode
                 if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
                     const refreshed = await refreshAuth();
                     if (!refreshed) throw new Error('Token refresh failed');
