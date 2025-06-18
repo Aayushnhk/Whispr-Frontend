@@ -6,12 +6,15 @@ import { Room } from "@/types";
 import { User, OnlineUser } from "@/types";
 import Link from "next/link";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
-import mongoose from "mongoose";
+// REMOVED: import mongoose from "mongoose"; // Mongoose is a server-side library
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
+// Changed to a string or a more generic ObjectId-like structure
+// Since this is a client-side component, we don't need Mongoose's specific ObjectId type.
+// The backend will send IDs as strings.
 type PopulatedCreator = {
-  _id: mongoose.Types.ObjectId | string;
+  _id: string; // Changed from mongoose.Types.ObjectId | string
   firstName: string;
   lastName: string;
   profilePicture?: string;
@@ -76,6 +79,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         <ul className="space-y-2">
           {rooms.map((room) => (
+            // Room IDs from the backend will be strings on the client
             <li
               key={room._id.toString()}
               className={`p-3 rounded-lg cursor-pointer transition-colors ${
@@ -117,7 +121,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                 {(user.role === "admin" ||
                   (room.creator &&
                     typeof room.creator !== "string" &&
-                    (room.creator as PopulatedCreator)._id?.toString() ===
+                    (room.creator as PopulatedCreator)._id === // Changed ._id?.toString() to ._id ===
                       user.id)) && (
                   <button
                     onClick={(e) => {
