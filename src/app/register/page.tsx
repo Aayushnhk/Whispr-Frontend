@@ -1,4 +1,3 @@
-// src/app/register/page.tsx
 "use client";
 
 import React, { useState, FormEvent } from "react";
@@ -62,6 +61,7 @@ export default function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include', // Added for CORS
         body: JSON.stringify({ firstName, lastName, email, password }),
       });
 

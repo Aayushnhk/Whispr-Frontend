@@ -47,6 +47,7 @@ const useOtherUser = ({ userId, currentUserId }: UseOtherUserProps) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          credentials: 'include', // Added for CORS
         });
 
         if (!response.ok) {

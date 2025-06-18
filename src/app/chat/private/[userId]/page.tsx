@@ -1,3 +1,4 @@
+// app/chat/private/[userId]/page.tsx
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
@@ -200,8 +201,17 @@ export default function PrivateChatPage() {
           );
         }
 
-        const response = await fetch(`${BACKEND_URL}/api/upload`, { // Updated API call
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Authentication token not found.");
+        }
+
+        const response = await fetch(`${BACKEND_URL}/api/upload`, {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, // Added Authorization header
+          },
+          credentials: 'include', // Added to support credentials with CORS
           body: formData,
         });
         if (!response.ok) {
@@ -258,7 +268,7 @@ export default function PrivateChatPage() {
     setMessages,
     clearTypingStatus,
     normalizeMessage,
-    BACKEND_URL // Added BACKEND_URL to dependencies
+    BACKEND_URL
   ]);
 
   const handleMessageInputChange = useCallback(

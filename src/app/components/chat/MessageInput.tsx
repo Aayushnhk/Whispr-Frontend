@@ -132,8 +132,16 @@ const MessageInput: React.FC<MessageInputProps> = ({
     const formData = new FormData();
     formData.append("file", audioBlob, `audio_message_${Date.now()}.webm`);
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authentication token not found.");
+      }
       const response = await fetch(`${BACKEND_URL}/api/upload`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // Added Authorization header
+        },
+        credentials: 'include', // Added to support credentials with CORS
         body: formData,
       });
       if (!response.ok) {
@@ -145,7 +153,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       // If the intent is to send the uploaded file URL/info, sendMessage might need to be updated
       // to accept arguments or a context that includes file details.
       // For now, assuming sendMessage handles sending the message based on the current state.
-      sendMessage(); 
+      sendMessage();
       setAudioBlob(null);
       setAudioUrl(null);
       setAudioChunks([]);

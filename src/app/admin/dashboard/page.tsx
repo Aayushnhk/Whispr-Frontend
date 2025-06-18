@@ -1,3 +1,4 @@
+// app/admin/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -44,10 +45,11 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      const response = await fetch(`${BACKEND_URL}/api/admin/users`, { // Updated API call
+      const response = await fetch(`${BACKEND_URL}/api/admin/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Added to support credentials with CORS
       });
 
       if (response.status === 401) {
@@ -68,7 +70,7 @@ export default function AdminDashboardPage() {
     } finally {
       setLoadingUsers(false);
     }
-  }, [logout, router, BACKEND_URL]); // Added BACKEND_URL to dependencies
+  }, [logout, router, BACKEND_URL]);
 
   useEffect(() => {
     if (!authLoading) {
@@ -110,12 +112,13 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      const response = await fetch(`${BACKEND_URL}/api/admin/users`, { // Updated API call
+      const response = await fetch(`${BACKEND_URL}/api/admin/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Added to support credentials with CORS
         body: JSON.stringify({ userId, role: newRole }),
       });
 
@@ -162,12 +165,13 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      const response = await fetch(`${BACKEND_URL}/api/admin/ban`, { // Updated API call
+      const response = await fetch(`${BACKEND_URL}/api/admin/ban`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Added to support credentials with CORS
         body: JSON.stringify({ userId, bannedStatus: newBannedStatus }),
       });
 

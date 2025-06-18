@@ -74,6 +74,7 @@ export default function UnifiedUserProfilePage() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
+            credentials: 'include', // Added for CORS
           }
         );
 
@@ -171,6 +172,7 @@ export default function UnifiedUserProfilePage() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Added for CORS
         body: formData,
       });
 
@@ -278,7 +280,8 @@ export default function UnifiedUserProfilePage() {
               alt="Profile Picture"
               width={160}
               height={160}
-              className="rounded-full border-4 border-blue-400 shadow-md object-cover w-40 h-40 transition-transform duration-200 hover:scale-105"
+              className="rounded-full border-4 border-blue-4
+00 shadow-md object-cover w-40 h-40 transition-transform duration-200 hover:scale-105"
               priority
             />
             <p className="text-2xl font-bold mt-4 text-gray-100">

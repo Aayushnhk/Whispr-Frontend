@@ -106,6 +106,7 @@ const useMessages = ({
               "Content-Type": "application/json",
               ...(token && { Authorization: `Bearer ${token}` }),
             },
+            credentials: 'include', // Added for CORS
           }
         );
         if (!response.ok) {
@@ -148,6 +149,7 @@ const useMessages = ({
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          credentials: 'include', // Added for CORS
         });
 
         if (!response.ok) {

@@ -1,3 +1,4 @@
+// app/chat/page.tsx
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
@@ -7,8 +8,7 @@ import useSocket from "@/app/hooks/useSocket";
 import useMessages from "@/app/hooks/useMessages";
 import { useAuth } from "@/context/AuthContext";
 import { User as UserType, OnlineUser, Message } from "@/types";
-// REMOVE: import jwt from "jsonwebtoken";
-import { jwtDecode } from "jwt-decode"; // ADD THIS: Use jwt-decode for client-side decoding
+import { jwtDecode } from "jwt-decode"; // Use jwt-decode for client-side decoding
 
 export default function ChatPage() {
   const {
@@ -102,7 +102,7 @@ export default function ChatPage() {
           }
 
           // Use jwtDecode for client-side decoding
-          const decoded = jwtDecode(token) as { exp?: number }; // Changed jwt.decode to jwtDecode
+          const decoded = jwtDecode(token) as { exp?: number };
           if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
             const refreshed = await handleTokenRefresh();
             if (!refreshed) return;
@@ -116,9 +116,10 @@ export default function ChatPage() {
           }
 
           const response = await fetch(
-            `${BACKEND_URL}/api/users?userId=${encodeURIComponent(receiverIdFromUrl)}`, // Updated API call
+            `${BACKEND_URL}/api/users?userId=${encodeURIComponent(receiverIdFromUrl)}`,
             {
               headers: { Authorization: `Bearer ${token}` },
+              credentials: 'include', // Added to support credentials with CORS
             }
           );
 
@@ -161,7 +162,7 @@ export default function ChatPage() {
     logout,
     handleTokenRefresh,
     setMessages,
-    BACKEND_URL // Added BACKEND_URL to dependencies
+    BACKEND_URL
   ]);
 
   const handleRoomChange = useCallback(
@@ -208,7 +209,7 @@ export default function ChatPage() {
         }
 
         // Use jwtDecode for client-side decoding
-        const decoded = jwtDecode(token) as { exp?: number }; // Changed jwt.decode to jwtDecode
+        const decoded = jwtDecode(token) as { exp?: number };
         if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
           const refreshed = await handleTokenRefresh();
           if (!refreshed) return;

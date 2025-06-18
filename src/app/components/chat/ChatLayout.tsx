@@ -1,3 +1,4 @@
+// src/app/components/chat/ChatLayout.tsx
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -131,11 +132,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         console.error("Backend URL is not configured. Cannot fetch rooms.");
         return;
       }
-      const response = await fetch(`${BACKEND_URL}/api/rooms`, { // Updated API call
+      const response = await fetch(`${BACKEND_URL}/api/rooms`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: 'include', // Added to support credentials with CORS
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -146,7 +148,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     } catch (error: any) {
       // Handle error, e.g., set an error state or log
     }
-  }, [BACKEND_URL]); // Added BACKEND_URL to dependencies
+  }, [BACKEND_URL]);
 
   useEffect(() => {
     fetchRooms();
@@ -241,11 +243,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (newRoomPictureFile) {
         formData.append("roomPicture", newRoomPictureFile);
       }
-      const response = await fetch(`${BACKEND_URL}/api/rooms`, { // Updated API call
+      const response = await fetch(`${BACKEND_URL}/api/rooms`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Added to support credentials with CORS
         body: formData,
       });
       if (!response.ok) {
@@ -340,11 +343,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       } else if (editRoomPicturePreview === null && editingRoom.roomPicture) {
         formData.append("clearPicture", "true");
       }
-      const response = await fetch(`${BACKEND_URL}/api/rooms/${editingRoom._id}`, { // Updated API call
+      const response = await fetch(`${BACKEND_URL}/api/rooms/${editingRoom._id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Added to support credentials with CORS
         body: formData,
       });
       if (!response.ok) {
@@ -358,7 +362,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           );
         }
       }
-      const responseData = await response.json();
       await fetchRooms();
       setShowEditRoomModal(false);
       setEditingRoom(null);
@@ -479,11 +482,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           console.error("Backend URL is not configured. Cannot upload file.");
           throw new Error("Backend URL is not configured.");
         }
-        const response = await fetch(`${BACKEND_URL}/api/upload`, { // Updated API call
+        const response = await fetch(`${BACKEND_URL}/api/upload`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          credentials: 'include', // Added to support credentials with CORS
           body: formData,
         });
         if (!response.ok) {
@@ -562,7 +566,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     setMessages,
     isUploadingFile,
     isProfilePictureUpload,
-    BACKEND_URL, // Added BACKEND_URL to dependencies
+    BACKEND_URL,
   ]);
 
   const handleMessageInputChange = (
