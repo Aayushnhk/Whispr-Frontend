@@ -1,4 +1,3 @@
-// src/app/login/page.tsx
 "use client";
 
 import React, { useState, FormEvent, useEffect } from 'react';
@@ -40,6 +39,7 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Added to support credentials
         body: JSON.stringify({ email, password }),
       });
 
@@ -63,6 +63,7 @@ export default function LoginPage() {
         setError(data.message || 'Login failed');
       }
     } catch (err: any) {
+      console.error('Login fetch error:', err); // Added for debugging
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
