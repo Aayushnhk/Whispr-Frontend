@@ -30,7 +30,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
   const { user, isAuthenticated, isLoading: authLoading, logout, refreshAuth } = useAuth();
   const socketRef = useRef<typeof Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
-  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:4001";
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4001";
 
   useEffect(() => {
     if (!isAuthenticated || authLoading || !user || !user.id || !user.firstName || !user.lastName) {
