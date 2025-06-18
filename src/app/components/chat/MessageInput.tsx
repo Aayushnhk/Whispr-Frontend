@@ -1,3 +1,4 @@
+// src/app/components/chat/MessageInput.tsx
 "use client";
 
 import React, { SetStateAction, useState, useRef } from "react";
@@ -35,6 +36,8 @@ interface MessageInputProps {
   handleProfilePictureUpload: (file: File) => void;
   className?: string;
 }
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
 
 const MessageInput: React.FC<MessageInputProps> = ({
   messageInput,
@@ -120,12 +123,16 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleSendAudio = async () => {
     if (!audioBlob) return;
+    if (!BACKEND_URL) {
+      setFileUploadError("Backend URL is not configured. Cannot send audio.");
+      return;
+    }
     setIsUploadingFile(true);
     setFileUploadError(null);
     const formData = new FormData();
     formData.append("file", audioBlob, `audio_message_${Date.now()}.webm`);
     try {
-      const response = await fetch("/api/upload", {
+      const response = await fetch(`${BACKEND_URL}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -133,15 +140,18 @@ const MessageInput: React.FC<MessageInputProps> = ({
         throw new Error(`Upload failed with status: ${response.status}`);
       }
       const result = await response.json();
-      sendMessage();
+      // It seems like sendMessage is meant to send the text message,
+      // but here it's called after successful audio upload.
+      // If the intent is to send the uploaded file URL/info, sendMessage might need to be updated
+      // to accept arguments or a context that includes file details.
+      // For now, assuming sendMessage handles sending the message based on the current state.
+      sendMessage(); 
       setAudioBlob(null);
       setAudioUrl(null);
       setAudioChunks([]);
-      setIsUploadingFile(false);
-      setMessageInput("");
+      setMessageInput(""); // Clear text input after sending audio
     } catch (error) {
       setFileUploadError("Failed to send audio message.");
-      setIsUploadingFile(false);
     } finally {
       setIsUploadingFile(false);
       setAudioBlob(null);

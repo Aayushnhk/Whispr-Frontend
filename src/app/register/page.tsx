@@ -1,3 +1,4 @@
+// src/app/register/page.tsx
 "use client";
 
 import React, { useState, FormEvent } from "react";
@@ -16,6 +17,8 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
 
   const validatePassword = (password: string): boolean => {
     const minLength = 8;
@@ -47,8 +50,14 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!BACKEND_URL) {
+      setError("Backend URL is not configured. Cannot register.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

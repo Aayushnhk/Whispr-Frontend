@@ -37,6 +37,9 @@ export default function PrivateChatPage() {
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null!);
 
+  // Define the backend URL from environment variables
+  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || ""; // Using NEXT_PUBLIC_URL as per your Vercel setup
+
   const { messages, setMessages, fetchPrivateMessages, normalizeMessage } = useMessages({
     isAuthenticated,
     user,
@@ -89,6 +92,12 @@ export default function PrivateChatPage() {
     }
     if (!messageInput.trim() && !selectedFile) {
       setFileUploadError("Message cannot be empty.");
+      return;
+    }
+
+    // Check if backend URL is available
+    if (!BACKEND_URL) {
+      setFileUploadError("Backend URL is not configured. Please check environment variables.");
       return;
     }
 
@@ -191,7 +200,7 @@ export default function PrivateChatPage() {
           );
         }
 
-        const response = await fetch("/api/upload", {
+        const response = await fetch(`${BACKEND_URL}/api/upload`, { // Updated API call
           method: "POST",
           body: formData,
         });
@@ -249,6 +258,7 @@ export default function PrivateChatPage() {
     setMessages,
     clearTypingStatus,
     normalizeMessage,
+    BACKEND_URL // Added BACKEND_URL to dependencies
   ]);
 
   const handleMessageInputChange = useCallback(
@@ -328,7 +338,9 @@ export default function PrivateChatPage() {
   );
 
   const handleProfilePictureUpload = useCallback((file: File) => {
-    
+    // This function is currently empty and does not make an API call.
+    // If it needs to upload to the backend in the future,
+    // you would add a fetch call here using BACKEND_URL.
   }, []);
 
   const handleContextMenu = useCallback(
@@ -437,9 +449,9 @@ export default function PrivateChatPage() {
       <ChatHeader
         chatHeaderTitle={`Chat with ${otherUser.username}`}
         isPrivateChat={true}
-        displayName={`${user.firstName} ${user.lastName}`} 
-        profilePicture={otherUser.profilePicture} 
-        logout={() => {}} 
+        displayName={`${user.firstName} ${user.lastName}`}
+        profilePicture={otherUser.profilePicture}
+        logout={() => {}}
         goBackToRooms={() => router.push("/chat")}
         className="bg-gray-800 shadow-md p-4 flex items-center justify-between"
       />

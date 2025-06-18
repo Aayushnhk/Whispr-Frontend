@@ -27,6 +27,9 @@ export default function ChatPage() {
   const [receiverLastName, setReceiverLastName] = useState<string | null>(null);
   const [onlineUsersData, setOnlineUsersData] = useState<OnlineUser[]>([]);
 
+  // Define the backend URL from environment variables
+  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || ""; // Using NEXT_PUBLIC_URL as per your Vercel setup
+
   const { messages, setMessages, fetchRoomMessages, fetchPrivateMessages } =
     useMessages({
       isAuthenticated,
@@ -105,8 +108,15 @@ export default function ChatPage() {
             if (!refreshed) return;
           }
 
+          // Check if backend URL is available
+          if (!BACKEND_URL) {
+            console.error("Backend URL is not configured. Cannot fetch receiver details.");
+            logout(); // Or handle this error gracefully
+            return;
+          }
+
           const response = await fetch(
-            `/api/users?userId=${encodeURIComponent(receiverIdFromUrl)}`,
+            `${BACKEND_URL}/api/users?userId=${encodeURIComponent(receiverIdFromUrl)}`, // Updated API call
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -151,6 +161,7 @@ export default function ChatPage() {
     logout,
     handleTokenRefresh,
     setMessages,
+    BACKEND_URL // Added BACKEND_URL to dependencies
   ]);
 
   const handleRoomChange = useCallback(

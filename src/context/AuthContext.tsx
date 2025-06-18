@@ -1,3 +1,4 @@
+// src/context/AuthContext.tsx
 "use client";
 
 import React, { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
@@ -42,6 +43,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const INACTIVITY_TIMEOUT = 3600000; // 1 hour
 
+    const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
+
     const updateLastActivity = useCallback(() => {
         localStorage.setItem('lastActivity', Date.now().toString());
     }, []);
@@ -70,7 +73,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 return false;
             }
 
-            const response = await fetch('/api/auth/refresh', {
+            if (!BACKEND_URL) {
+                console.error("Backend URL is not configured. Cannot refresh auth token.");
+                logout();
+                return false;
+            }
+
+            const response = await fetch(`${BACKEND_URL}/api/auth/refresh`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             logout();
             return false;
         }
-    }, [logout, updateLastActivity]);
+    }, [logout, updateLastActivity, BACKEND_URL]);
 
     const login = useCallback((
         newToken: string,
@@ -135,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
                     const refreshed = await refreshAuth();
                     if (!refreshed) throw new Error('Token refresh failed');
-                    return; 
+                    return;
                 }
 
                 if (storedLastActivity) {

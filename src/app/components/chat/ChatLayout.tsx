@@ -64,6 +64,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     return match ? match[1] : undefined;
   })();
 
+  // Define the backend URL from environment variables
+  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
+
   const [messageInput, setMessageInput] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
@@ -123,7 +126,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         return;
       }
-      const response = await fetch("/api/rooms", {
+      // Ensure BACKEND_URL is available
+      if (!BACKEND_URL) {
+        console.error("Backend URL is not configured. Cannot fetch rooms.");
+        return;
+      }
+      const response = await fetch(`${BACKEND_URL}/api/rooms`, { // Updated API call
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -135,8 +143,10 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       }
       const data: Room[] = await response.json();
       setRooms(data);
-    } catch (error: any) {}
-  }, []);
+    } catch (error: any) {
+      // Handle error, e.g., set an error state or log
+    }
+  }, [BACKEND_URL]); // Added BACKEND_URL to dependencies
 
   useEffect(() => {
     fetchRooms();
@@ -220,13 +230,18 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         throw new Error("Authentication token not found.");
       }
+      // Ensure BACKEND_URL is available
+      if (!BACKEND_URL) {
+        console.error("Backend URL is not configured. Cannot add room.");
+        throw new Error("Backend URL is not configured.");
+      }
       const formData = new FormData();
       formData.append("roomName", newRoomName.trim());
       formData.append("description", newRoomDescription.trim());
       if (newRoomPictureFile) {
         formData.append("roomPicture", newRoomPictureFile);
       }
-      const response = await fetch("/api/rooms", {
+      const response = await fetch(`${BACKEND_URL}/api/rooms`, { // Updated API call
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -309,6 +324,11 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         throw new Error("Authentication token not found.");
       }
+      // Ensure BACKEND_URL is available
+      if (!BACKEND_URL) {
+        console.error("Backend URL is not configured. Cannot update room.");
+        throw new Error("Backend URL is not configured.");
+      }
       const formData = new FormData();
       formData.append("roomName", editRoomName.trim());
       formData.append(
@@ -320,7 +340,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       } else if (editRoomPicturePreview === null && editingRoom.roomPicture) {
         formData.append("clearPicture", "true");
       }
-      const response = await fetch(`/api/rooms/${editingRoom._id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/rooms/${editingRoom._id}`, { // Updated API call
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -454,7 +474,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           );
         }
         const token = localStorage.getItem("token");
-        const response = await fetch("/api/upload", {
+        // Ensure BACKEND_URL is available
+        if (!BACKEND_URL) {
+          console.error("Backend URL is not configured. Cannot upload file.");
+          throw new Error("Backend URL is not configured.");
+        }
+        const response = await fetch(`${BACKEND_URL}/api/upload`, { // Updated API call
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -537,6 +562,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     setMessages,
     isUploadingFile,
     isProfilePictureUpload,
+    BACKEND_URL, // Added BACKEND_URL to dependencies
   ]);
 
   const handleMessageInputChange = (

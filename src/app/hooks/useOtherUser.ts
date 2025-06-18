@@ -13,6 +13,8 @@ interface OtherUser {
   profilePicture?: string;
 }
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
+
 const useOtherUser = ({ userId, currentUserId }: UseOtherUserProps) => {
   const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,13 +31,18 @@ const useOtherUser = ({ userId, currentUserId }: UseOtherUserProps) => {
     const fetchOtherUser = async () => {
       setLoading(true);
       setError(null);
+      if (!BACKEND_URL) {
+        setError("Backend URL is not configured. Cannot fetch user details.");
+        setLoading(false);
+        return;
+      }
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch(`/api/user?id=${userId}`, {
+        const response = await fetch(`${BACKEND_URL}/api/user?id=${userId}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

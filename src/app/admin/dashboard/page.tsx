@@ -23,6 +23,9 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
 
+  // Define the backend URL from environment variables
+  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || ""; // Using NEXT_PUBLIC_URL as per your Vercel setup
+
   const fetchUsers = useCallback(async () => {
     setLoadingUsers(true);
     setError("");
@@ -34,7 +37,14 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      const response = await fetch("/api/admin/users", {
+      // Check if backend URL is available
+      if (!BACKEND_URL) {
+        setError("Backend URL is not configured. Please check environment variables.");
+        setLoadingUsers(false);
+        return;
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/admin/users`, { // Updated API call
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,7 +68,7 @@ export default function AdminDashboardPage() {
     } finally {
       setLoadingUsers(false);
     }
-  }, [logout, router]);
+  }, [logout, router, BACKEND_URL]); // Added BACKEND_URL to dependencies
 
   useEffect(() => {
     if (!authLoading) {
@@ -94,7 +104,13 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      const response = await fetch("/api/admin/users", {
+      // Check if backend URL is available
+      if (!BACKEND_URL) {
+        setError("Backend URL is not configured. Please check environment variables.");
+        return;
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/admin/users`, { // Updated API call
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +156,13 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      const response = await fetch("/api/admin/ban", {
+      // Check if backend URL is available
+      if (!BACKEND_URL) {
+        setError("Backend URL is not configured. Please check environment variables.");
+        return;
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/admin/ban`, { // Updated API call
         method: "POST",
         headers: {
           "Content-Type": "application/json",

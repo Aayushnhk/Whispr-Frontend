@@ -8,6 +8,8 @@ interface UseMessagesProps {
   receiverId?: string | null;
 }
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
+
 const useMessages = ({
   isAuthenticated,
   user,
@@ -91,10 +93,14 @@ const useMessages = ({
       if (!isAuthenticated) {
         return;
       }
+      if (!BACKEND_URL) {
+        console.error("Backend URL is not configured. Cannot fetch room messages.");
+        return;
+      }
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `/api/messages?room=${roomName}&limit=${limit}&skip=${skip}`,
+          `${BACKEND_URL}/api/messages?room=${roomName}&limit=${limit}&skip=${skip}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -125,13 +131,17 @@ const useMessages = ({
       if (!isAuthenticated || !currentLoggedInUserId || !targetReceiverId) {
         return;
       }
+      if (!BACKEND_URL) {
+        console.error("Backend URL is not configured. Cannot fetch private messages.");
+        return;
+      }
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           throw new Error("Authentication token not found in local storage.");
         }
 
-        const url = `/api/messages/private/${targetReceiverId}?limit=${limit}&skip=${skip}`;
+        const url = `${BACKEND_URL}/api/messages/private/${targetReceiverId}?limit=${limit}&skip=${skip}`;
 
         const response = await fetch(url, {
           headers: {

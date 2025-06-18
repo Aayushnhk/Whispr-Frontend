@@ -15,6 +15,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
 
+  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
+
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       router.replace('/chat');
@@ -26,8 +28,14 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
+    if (!BACKEND_URL) {
+      setError("Backend URL is not configured. Cannot log in.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
