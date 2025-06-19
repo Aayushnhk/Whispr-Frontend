@@ -52,7 +52,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        path: "/socket.io/", // <--- This line was added/confirmed
+        path: "/socket.io", 
       });
       socketRef.current = newSocket;
     }
