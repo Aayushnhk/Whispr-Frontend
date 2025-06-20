@@ -27,28 +27,13 @@ interface GlobalSocketManagerProps {
 export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
   children,
 }) => {
-  const {
-    user,
-    isAuthenticated,
-    isLoading: authLoading,
-    logout,
-    refreshAuth,
-  } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, logout, refreshAuth } = useAuth();
   const socketRef = useRef<typeof Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
-  const socketUrl =
-    process.env.NEXT_PUBLIC_SOCKET_URL ||
-    "https://whispr-backend-sarl.onrender.com";
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "https://whispr-backend-sarl.onrender.com";
 
   useEffect(() => {
-    if (
-      !isAuthenticated ||
-      authLoading ||
-      !user ||
-      !user.id ||
-      !user.firstName ||
-      !user.lastName
-    ) {
+    if (!isAuthenticated || authLoading || !user || !user.id || !user.firstName || !user.lastName) {
       if (socketRef.current?.connected) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -67,6 +52,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
+        path: "/ws/socket.io/", 
       });
       socketRef.current = newSocket;
     }
@@ -79,25 +65,13 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
 
     const handleConnect = () => {
       if (user && user.id && user.firstName && user.lastName) {
-        socket?.emit(
-          "registerUser",
-          user.id,
-          user.firstName,
-          user.lastName,
-          user.profilePicture
-        );
+        socket?.emit('registerUser', user.id, user.firstName, user.lastName, user.profilePicture);
       }
     };
 
     const handleReconnect = () => {
       if (user && user.id && user.firstName && user.lastName) {
-        socket?.emit(
-          "registerUser",
-          user.id,
-          user.firstName,
-          user.lastName,
-          user.profilePicture
-        );
+        socket?.emit('registerUser', user.id, user.firstName, user.lastName, user.profilePicture);
       }
     };
 
@@ -107,42 +81,37 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
 
     const handleDisconnect = (reason: string) => {
       setOnlineUsers([]);
-      if (reason === "io server disconnect" && socket?.id) {
+      if (reason === 'io server disconnect' && socket?.id) {
       }
     };
 
     if (socket) {
-      socket.on("connect", handleConnect);
-      socket.io.on("reconnect", handleReconnect);
-      socket.on("onlineUsers", handleOnlineUsers);
-      socket.on("disconnect", handleDisconnect);
-      socket.on("connect_error", (error: Error) => {
-        if (
-          error.message.includes("Authentication error") ||
-          error.message.includes("jwt expired")
-        ) {
-          refreshAuth()
-            .then((refreshed) => {
-              if (refreshed) {
-                socket.connect();
-              } else {
-                logout();
-              }
-            })
-            .catch(() => {
+      socket.on('connect', handleConnect);
+      socket.io.on('reconnect', handleReconnect);
+      socket.on('onlineUsers', handleOnlineUsers);
+      socket.on('disconnect', handleDisconnect);
+      socket.on('connect_error', (error: Error) => {
+        if (error.message.includes("Authentication error") || error.message.includes("jwt expired")) {
+          refreshAuth().then(refreshed => {
+            if (refreshed) {
+              socket.connect();
+            } else {
               logout();
-            });
+            }
+          }).catch(() => {
+            logout();
+          });
         }
       });
     }
 
     return () => {
       if (socket) {
-        socket.off("connect", handleConnect);
-        socket.io.off("reconnect", handleReconnect);
-        socket.off("onlineUsers", handleOnlineUsers);
-        socket.off("disconnect", handleDisconnect);
-        socket.off("connect_error");
+        socket.off('connect', handleConnect);
+        socket.io.off('reconnect', handleReconnect);
+        socket.off('onlineUsers', handleOnlineUsers);
+        socket.off('disconnect', handleDisconnect);
+        socket.off('connect_error');
         socket.disconnect();
         socketRef.current = null;
       }
@@ -161,9 +130,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
 export const useSocketContext = () => {
   const context = useContext(SocketContext);
   if (!context) {
-    throw new Error(
-      "useSocketContext must be used within a GlobalSocketManager"
-    );
+    throw new Error("useSocketContext must be used within a GlobalSocketManager");
   }
   return context;
 };
