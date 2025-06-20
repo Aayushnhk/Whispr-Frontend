@@ -30,7 +30,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
   const { user, isAuthenticated, isLoading: authLoading, logout, refreshAuth } = useAuth();
   const socketRef = useRef<typeof Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
-  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "https://whispr-backend-sarl.onrender.com";
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "whispr-backend-production-b02e.up.railway.app";
 
   useEffect(() => {
     if (!isAuthenticated || authLoading || !user || !user.id || !user.firstName || !user.lastName) {
