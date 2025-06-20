@@ -27,20 +27,29 @@ interface GlobalSocketManagerProps {
 export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
   children,
 }) => {
-  const { user, isAuthenticated, isLoading: authLoading, logout, refreshAuth } = useAuth();
+  const {
+    user,
+    isAuthenticated,
+    isLoading: authLoading,
+    logout,
+    refreshAuth,
+  } = useAuth();
   const socketRef = useRef<typeof Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
 
-  // *** IMPORTANT CHANGE HERE ***
-  // Ensure socketUrl always includes '/socket.io' if NEXT_PUBLIC_SOCKET_URL is not set,
-  // and prioritize the environment variable if it IS set.
   const socketUrl =
     process.env.NEXT_PUBLIC_SOCKET_URL ||
     "https://whispr-backend-sarl.onrender.com/socket.io";
-  // *** END IMPORTANT CHANGE ***
 
   useEffect(() => {
-    if (!isAuthenticated || authLoading || !user || !user.id || !user.firstName || !user.lastName) {
+    if (
+      !isAuthenticated ||
+      authLoading ||
+      !user ||
+      !user.id ||
+      !user.firstName ||
+      !user.lastName
+    ) {
       if (socketRef.current?.connected) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -49,10 +58,11 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
       return;
     }
 
-    // *** IMPORTANT: Add a check for socketUrl here ***
     if (!socketUrl) {
-        console.error("NEXT_PUBLIC_SOCKET_URL is not defined or is empty! Socket connection cannot proceed.");
-        return; // Exit if socketUrl is truly missing
+      console.error(
+        "NEXT_PUBLIC_SOCKET_URL is not defined or is empty! Socket connection cannot proceed."
+      );
+      return;
     }
 
     if (!socketRef.current || socketRef.current.io.uri !== socketUrl) {
@@ -60,7 +70,6 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
         socketRef.current.disconnect();
       }
 
-      // --- CRITICAL DEBUG LOGS ---
       console.log("DEBUG 1: socketUrl passed to io():", socketUrl); // What 'io()' receives
 
       const newSocket: typeof Socket = io(socketUrl, {
@@ -69,16 +78,12 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        // *** IMPORTANT CHANGE HERE ***
-        // REMOVE THE 'path' OPTION COMPLETELY.
-        // socketUrl now contains the full path ("/socket.io"), so this option is redundant and can conflict.
-        // If you see 'path: "/socket.io",' below this line, DELETE IT.
-        // path: "/socket.io", // THIS LINE SHOULD BE DELETED
-        // *** END IMPORTANT CHANGE ***
       });
 
-      console.log("DEBUG 2: newSocket.io.uri (after io() initialization):", newSocket.io.uri); // What socket.io-client actually builds
-      // --- END DEBUG LOGS ---
+      console.log(
+        "DEBUG 2: newSocket.io.uri (after io() initialization):",
+        newSocket.io.uri
+      );
 
       socketRef.current = newSocket;
     }
@@ -91,13 +96,25 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
 
     const handleConnect = () => {
       if (user && user.id && user.firstName && user.lastName) {
-        socket?.emit('registerUser', user.id, user.firstName, user.lastName, user.profilePicture);
+        socket?.emit(
+          "registerUser",
+          user.id,
+          user.firstName,
+          user.lastName,
+          user.profilePicture
+        );
       }
     };
 
     const handleReconnect = () => {
       if (user && user.id && user.firstName && user.lastName) {
-        socket?.emit('registerUser', user.id, user.firstName, user.lastName, user.profilePicture);
+        socket?.emit(
+          "registerUser",
+          user.id,
+          user.firstName,
+          user.lastName,
+          user.profilePicture
+        );
       }
     };
 
@@ -107,45 +124,48 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
 
     const handleDisconnect = (reason: string) => {
       setOnlineUsers([]);
-      if (reason === 'io server disconnect' && socket?.id) {
-        // Handle server initiated disconnect (e.g., for token expiry)
-        // If you want to reconnect, call socket.connect() here, or rely on reconnection:true
+      if (reason === "io server disconnect" && socket?.id) {
       }
     };
 
     if (socket) {
-      socket.on('connect', handleConnect);
-      socket.io.on('reconnect', handleReconnect);
-      socket.on('onlineUsers', handleOnlineUsers);
-      socket.on('disconnect', handleDisconnect);
-      socket.on('connect_error', (error: Error) => {
+      socket.on("connect", handleConnect);
+      socket.io.on("reconnect", handleReconnect);
+      socket.on("onlineUsers", handleOnlineUsers);
+      socket.on("disconnect", handleDisconnect);
+      socket.on("connect_error", (error: Error) => {
         console.error("Socket connection error:", error); // Log the error for debugging
-        if (error.message.includes("Authentication error") || error.message.includes("jwt expired")) {
-          refreshAuth().then(refreshed => {
-            if (refreshed) {
-              socket.connect();
-            } else {
+        if (
+          error.message.includes("Authentication error") ||
+          error.message.includes("jwt expired")
+        ) {
+          refreshAuth()
+            .then((refreshed) => {
+              if (refreshed) {
+                socket.connect();
+              } else {
+                logout();
+              }
+            })
+            .catch(() => {
               logout();
-            }
-          }).catch(() => {
-            logout();
-          });
+            });
         }
       });
     }
 
     return () => {
       if (socket) {
-        socket.off('connect', handleConnect);
-        socket.io.off('reconnect', handleReconnect);
-        socket.off('onlineUsers', handleOnlineUsers);
-        socket.off('disconnect', handleDisconnect);
-        socket.off('connect_error'); // Remove specific error listener
+        socket.off("connect", handleConnect);
+        socket.io.off("reconnect", handleReconnect);
+        socket.off("onlineUsers", handleOnlineUsers);
+        socket.off("disconnect", handleDisconnect);
+        socket.off("connect_error");
         socket.disconnect();
         socketRef.current = null;
       }
     };
-  }, [isAuthenticated, authLoading, socketUrl, user, logout, refreshAuth]); // Keep socketUrl in dependency array
+  }, [isAuthenticated, authLoading, socketUrl, user, logout, refreshAuth]);
 
   const contextValue = { socket: socketRef.current, onlineUsers };
 
@@ -159,7 +179,9 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
 export const useSocketContext = () => {
   const context = useContext(SocketContext);
   if (!context) {
-    throw new Error("useSocketContext must be used within a GlobalSocketManager");
+    throw new Error(
+      "useSocketContext must be used within a GlobalSocketManager"
+    );
   }
   return context;
 };
