@@ -168,7 +168,7 @@ export default function UnifiedUserProfilePage() {
       }
 
       // 1. Get signature from your backend
-      const signatureResponse = await fetch(`${BACKEND_URL}/api/upload`, {
+      const signatureResponse = await fetch(`${BACKEND_URL}/api/cloudinary-sign-upload`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
