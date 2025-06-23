@@ -137,7 +137,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 className="w-full px-4 py-2.5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-100 placeholder-gray-400"
-                placeholder="your@email.com"
+                placeholder="Enter your email"
               />
             </div>
 
