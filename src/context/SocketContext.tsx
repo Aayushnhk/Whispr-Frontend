@@ -1,13 +1,6 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-  useRef,
-} from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
 import io from "socket.io-client";
 import { useAuth } from "./AuthContext";
 import { OnlineUser } from "@/types";
@@ -36,6 +29,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
   } = useAuth();
   const socketRef = useRef<typeof Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const pingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const socketUrl =
     process.env.NEXT_PUBLIC_SOCKET_URL ||
@@ -55,6 +49,10 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
         socketRef.current = null;
         setOnlineUsers([]);
       }
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = null;
+      }
       return;
     }
 
@@ -70,14 +68,16 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
         socketRef.current.disconnect();
       }
 
-      console.log("DEBUG 1: socketUrl passed to io():", socketUrl); // What 'io()' receives
+      console.log("DEBUG 1: socketUrl passed to io():", socketUrl);
 
-      const newSocket: typeof Socket = io(socketUrl, {
+      const newSocket = io(socketUrl, {
         autoConnect: false,
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: 10,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
+        transports: ["websocket", "polling"],
+        timeout: 20000,
       });
 
       console.log(
@@ -104,6 +104,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
           user.profilePicture
         );
       }
+      console.log("Socket connected:", socket?.id);
     };
 
     const handleReconnect = () => {
@@ -116,6 +117,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
           user.profilePicture
         );
       }
+      console.log("Socket reconnected:", socket?.id);
     };
 
     const handleOnlineUsers = (usersList: OnlineUser[]) => {
@@ -123,9 +125,28 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
     };
 
     const handleDisconnect = (reason: string) => {
+      console.log("Socket disconnected:", reason);
       setOnlineUsers([]);
-      if (reason === "io server disconnect" && socket?.id) {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = null;
       }
+    };
+
+    const startPing = () => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+      }
+      pingIntervalRef.current = setInterval(() => {
+        if (socket?.connected) {
+          socket.emit("ping", () => {
+            console.log("Ping sent at:", new Date().toISOString());
+          });
+        } else {
+          console.log("Socket not connected, attempting reconnect...");
+          socket?.connect();
+        }
+      }, 5 * 60 * 1000);
     };
 
     if (socket) {
@@ -133,8 +154,8 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
       socket.io.on("reconnect", handleReconnect);
       socket.on("onlineUsers", handleOnlineUsers);
       socket.on("disconnect", handleDisconnect);
-      socket.on("connect_error", (error: Error) => {
-        console.error("Socket connection error:", error); // Log the error for debugging
+      socket.on("connect_error", (error: Error) => { // Explicitly type 'error' as Error
+        console.error("Socket connect_error:", error.message, error.stack);
         if (
           error.message.includes("Authentication error") ||
           error.message.includes("jwt expired")
@@ -152,6 +173,8 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
             });
         }
       });
+
+      socket.on("connect", startPing);
     }
 
     return () => {
@@ -161,6 +184,10 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
         socket.off("onlineUsers", handleOnlineUsers);
         socket.off("disconnect", handleDisconnect);
         socket.off("connect_error");
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current);
+          pingIntervalRef.current = null;
+        }
         socket.disconnect();
         socketRef.current = null;
       }
