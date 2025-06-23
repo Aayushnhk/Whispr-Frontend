@@ -42,13 +42,15 @@ const useOtherUser = ({ userId, currentUserId }: UseOtherUserProps) => {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch(`${BACKEND_URL}/api/user?id=${userId}`, {
+        // --- FIX STARTS HERE ---
+        const response = await fetch(`${BACKEND_URL}/api/users?userId=${userId}`, { // Changed '/api/user?id=' to '/api/users?userId='
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          credentials: 'include', // Added for CORS
+          credentials: 'include',
         });
+        // --- FIX ENDS HERE ---
 
         if (!response.ok) {
           const errorData = await response.json();
