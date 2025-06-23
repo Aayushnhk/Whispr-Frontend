@@ -37,6 +37,8 @@ export default function UnifiedUserProfilePage() {
   const isCurrentUserProfile = currentUserId === profileUserId;
 
   const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
+  const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "";
+  const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "";
 
   useEffect(() => {
     if (authLoading) return;
@@ -117,7 +119,7 @@ export default function UnifiedUserProfilePage() {
         return;
       }
       if (file.size > maxSize) {
-        setUploadError("File size exceedsilty 5MB limit.");
+        setUploadError("File size exceeds 5MB limit.");
         setSelectedFile(null);
         return;
       }
@@ -144,6 +146,12 @@ export default function UnifiedUserProfilePage() {
       return;
     }
 
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+      setUploadError("Cloudinary environment variables not set. Cannot upload.");
+      setIsUploading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -159,46 +167,98 @@ export default function UnifiedUserProfilePage() {
         return;
       }
 
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("senderId", currentUserId);
-      formData.append("fileType", "image");
-      formData.append("fileName", selectedFile.name);
-      formData.append("chatType", "private");
-      formData.append("isProfilePictureUpload", "true");
-
-      const response = await fetch(`${BACKEND_URL}/api/upload`, {
+      // 1. Get signature from your backend
+      const signatureResponse = await fetch(`${BACKEND_URL}/api/upload`, {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: "include",
-        body: formData,
+        body: JSON.stringify({
+          folder: "WHISPR_profile_pictures",
+          upload_preset: CLOUDINARY_UPLOAD_PRESET,
+          resource_type: selectedFile.type.startsWith("image/") ? "image" : "raw", // Ensure correct resource type
+        }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message.includes("Cloudinary")
-            ? "Failed to upload to Cloudinary. Please try again later or contact support."
-            : errorData.message || "Failed to upload profile picture."
-        );
+      if (!signatureResponse.ok) {
+        const errorData = await signatureResponse.json();
+        throw new Error(errorData.message || "Failed to get Cloudinary signature.");
       }
 
-      const data = await response.json();
-      setUploadMessage("Profile picture updated successfully!");
+      const { signature, timestamp, api_key, cloud_name, upload_preset, folder } = await signatureResponse.json();
+
+      // 2. Upload directly to Cloudinary using the signature
+      const cloudinaryFormData = new FormData();
+      cloudinaryFormData.append("file", selectedFile);
+      cloudinaryFormData.append("api_key", api_key);
+      cloudinaryFormData.append("timestamp", timestamp);
+      cloudinaryFormData.append("signature", signature);
+      cloudinaryFormData.append("folder", folder);
+      cloudinaryFormData.append("upload_preset", upload_preset); // Include upload_preset
+
+      // Determine resource type for Cloudinary URL (e.g., 'image', 'video', 'raw')
+      const cloudinaryResourceType = selectedFile.type.startsWith("image/") ? "image" : 
+                                     selectedFile.type.startsWith("video/") ? "video" : "raw";
+
+      const cloudinaryUploadResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloud_name}/${cloudinaryResourceType}/upload`,
+        {
+          method: "POST",
+          body: cloudinaryFormData,
+        }
+      );
+
+      if (!cloudinaryUploadResponse.ok) {
+        const errorText = await cloudinaryUploadResponse.text();
+        console.error("Cloudinary direct upload error:", errorText);
+        try {
+          const errorJson = JSON.parse(errorText);
+          throw new Error(errorJson.error?.message || "Cloudinary direct upload failed.");
+        } catch (parseError) {
+          throw new Error(`Cloudinary direct upload failed with status ${cloudinaryUploadResponse.status}: ${errorText.substring(0, 100)}...`);
+        }
+      }
+
+      const cloudinaryData = await cloudinaryUploadResponse.json();
+      const fileUrl = cloudinaryData.secure_url;
+
+      if (!fileUrl) {
+        throw new Error("Cloudinary upload did not return a secure URL.");
+      }
+
+      // 3. Update profile picture in your own backend DB
+      const updateDbResponse = await fetch(`${BACKEND_URL}/api/update-profile-picture`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId: currentUserId, profilePictureUrl: fileUrl }),
+      });
+
+      if (!updateDbResponse.ok) {
+        const errorData = await updateDbResponse.json();
+        throw new Error(errorData.message || "Failed to update profile picture in database.");
+      }
+
+      const updateDbData = await updateDbResponse.json();
+
+      setUploadMessage(updateDbData.message || "Profile picture updated successfully!");
       if (userProfile && isCurrentUserProfile) {
         setUserProfile({
           ...userProfile,
-          profilePicture: data.messageDetails.fileUrl,
+          profilePicture: updateDbData.profilePicture, // Use the URL returned by your backend
         });
       }
     } catch (error: any) {
+      console.error("Upload process error:", error);
       setUploadError(
         error.message || "An unexpected error occurred during upload."
       );
     } finally {
       setIsUploading(false);
+      setSelectedFile(null); // Clear selected file after upload attempt
     }
   };
 
