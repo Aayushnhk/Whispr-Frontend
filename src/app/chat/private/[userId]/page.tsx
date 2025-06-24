@@ -38,6 +38,9 @@ export default function PrivateChatPage() {
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null!);
 
+  // State for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   // Define the backend URL from environment variables
   const BACKEND_URL = process.env.NEXT_PUBLIC_URL || ""; // Using NEXT_PUBLIC_URL as per your Vercel setup
 
@@ -461,9 +464,11 @@ export default function PrivateChatPage() {
         isPrivateChat={true}
         displayName={`${user.firstName} ${user.lastName}`}
         profilePicture={otherUser.profilePicture}
-        logout={() => {}}
+        logout={logout}
         goBackToRooms={() => router.push("/chat")}
         className="bg-gray-800 shadow-md p-4 flex items-center justify-between"
+        onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} // Added
+        isSidebarOpen={isSidebarOpen} // Added
       />
       <ChatMessages
         messages={messages}
