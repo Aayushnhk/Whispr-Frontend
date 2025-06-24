@@ -742,7 +742,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       setContextMenu({
         visible: true,
         messageId: msg.id,
-        position: { x: 0, y: y + 10 },
+        position: { x: 0, y: 0 },
       });
     }
   };
@@ -879,7 +879,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           handleDelete={handleDelete}
           handleReply={handleReply}
           messagesEndRef={messagesEndRef}
-          className="flex-1"
+          className="flex-1 scrollbar-hide"
         />
         <MessageInput
           messageInput={messageInput}
