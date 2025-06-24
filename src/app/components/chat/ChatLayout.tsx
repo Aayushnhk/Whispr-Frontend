@@ -65,7 +65,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     return match ? match[1] : undefined;
   })();
 
-  // Define the backend URL from environment variables
   const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
 
   const [messageInput, setMessageInput] = useState<string>("");
@@ -104,6 +103,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
   const isTypingRef = useRef<boolean>(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const getFileType = (mimeType: string): Message["fileType"] => {
     if (mimeType.startsWith("image/")) return "image";
     if (mimeType.startsWith("video/")) return "video";
@@ -127,7 +128,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         return;
       }
-      // Ensure BACKEND_URL is available
       if (!BACKEND_URL) {
         console.error("Backend URL is not configured. Cannot fetch rooms.");
         return;
@@ -137,7 +137,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: 'include',
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -146,7 +146,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       const data: Room[] = await response.json();
       setRooms(data);
     } catch (error: any) {
-      // Handle error, e.g., set an error state or log
     }
   }, [BACKEND_URL]);
 
@@ -232,7 +231,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         throw new Error("Authentication token not found.");
       }
-      // Ensure BACKEND_URL is available
       if (!BACKEND_URL) {
         console.error("Backend URL is not configured. Cannot add room.");
         throw new Error("Backend URL is not configured.");
@@ -248,7 +246,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: 'include',
         body: formData,
       });
       if (!response.ok) {
@@ -327,7 +325,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         throw new Error("Authentication token not found.");
       }
-      // Ensure BACKEND_URL is available
       if (!BACKEND_URL) {
         console.error("Backend URL is not configured. Cannot update room.");
         throw new Error("Backend URL is not configured.");
@@ -348,7 +345,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: 'include',
         body: formData,
       });
       if (!response.ok) {
@@ -477,7 +474,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           );
         }
         const token = localStorage.getItem("token");
-        // Ensure BACKEND_URL is available
         if (!BACKEND_URL) {
           console.error("Backend URL is not configured. Cannot upload file.");
           throw new Error("Backend URL is not configured.");
@@ -487,7 +483,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          credentials: 'include', // Added to support credentials with CORS
+          credentials: 'include',
           body: formData,
         });
         if (!response.ok) {
@@ -801,18 +797,44 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
 
   return (
     <div className="flex h-screen bg-gray-900">
-      <ChatSidebar
-        rooms={rooms}
-        onlineUsers={onlineUsers}
-        currentRoom={currentRoom}
-        handleRoomChange={handleRoomChange}
-        startPrivateConversation={startPrivateConversation}
-        navigateToUserProfile={navigateToUserProfile}
-        user={user}
-        className="shadow-lg"
-        onAddRoomClick={handleOnAddRoomClick}
-        onEditRoomClick={handleOnEditRoomClick}
-      />
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-40 w-3/4 bg-gray-900 border-r border-gray-800
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:relative md:translate-x-0 md:w-1/4 md:flex md:flex-col
+          ${!isSidebarOpen && 'hidden md:flex'}
+        `}
+      >
+        <ChatSidebar
+          rooms={rooms}
+          onlineUsers={onlineUsers}
+          currentRoom={currentRoom}
+          handleRoomChange={handleRoomChange}
+          startPrivateConversation={startPrivateConversation}
+          navigateToUserProfile={navigateToUserProfile}
+          user={user}
+          className="shadow-lg flex-1"
+          onAddRoomClick={handleOnAddRoomClick}
+          onEditRoomClick={handleOnEditRoomClick}
+          onSidebarItemClick={() => setIsSidebarOpen(false)}
+        />
+        <button
+          className="md:hidden absolute top-4 right-4 text-gray-400 hover:text-gray-200"
+          onClick={() => setIsSidebarOpen(false)}
+          title="Close Sidebar"
+        >
+          <XCircleIcon className="h-7 w-7" />
+        </button>
+      </aside>
+
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-60 z-30 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
+
       <div className="flex-1 flex flex-col">
         <ChatHeader
           chatHeaderTitle={chatHeaderTitle}
@@ -821,6 +843,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           logout={logout}
           goBackToRooms={() => handleRoomChange("general")}
           className="shadow-sm"
+          onMenuClick={() => setIsSidebarOpen(true)}
+          isSidebarOpen={isSidebarOpen}
         />
         <ChatMessages
           messages={messages}

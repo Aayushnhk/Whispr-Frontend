@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { Bars3Icon } from "@heroicons/react/24/outline"; // Import the hamburger icon
 
 interface ChatHeaderProps {
   chatHeaderTitle: string;
@@ -11,6 +12,8 @@ interface ChatHeaderProps {
   logout: () => void;
   goBackToRooms: () => void;
   className?: string;
+  onMenuClick: () => void; // Added prop
+  isSidebarOpen: boolean; // Added prop
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -21,12 +24,23 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   logout,
   goBackToRooms,
   className = "",
+  onMenuClick, // Destructure the new prop
+  isSidebarOpen, // Destructure the new prop
 }) => {
   return (
     <header
       className={`flex items-center justify-between p-3 bg-gray-900 border-b border-gray-800 shadow-md ${className}`}
     >
       <div className="flex items-center">
+        {/* Hamburger icon for mobile sidebar toggle */}
+        <button
+          className="md:hidden mr-3 text-gray-400 hover:text-gray-200"
+          onClick={onMenuClick}
+          title="Open Sidebar"
+        >
+          <Bars3Icon className="h-7 w-7" />
+        </button>
+
         {isPrivateChat && profilePicture && (
           <Image
             src={profilePicture || "/default-avatar.png"}
@@ -44,7 +58,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       <div className="flex items-center space-x-4">
         {!isPrivateChat && (
           <>
-            <span className="text-gray-300 text-sm">
+            <span className="text-gray-300 text-sm hidden md:inline">
               Logged in as{" "}
               <span className="font-medium text-blue-400">
                 {displayName}

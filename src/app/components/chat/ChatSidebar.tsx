@@ -26,6 +26,7 @@ interface ChatSidebarProps {
   className?: string;
   onAddRoomClick: () => void;
   onEditRoomClick: (room: Room) => void;
+  onSidebarItemClick: () => void; // Added prop
 }
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({
@@ -39,6 +40,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
   className = "",
   onAddRoomClick,
   onEditRoomClick,
+  onSidebarItemClick, // Destructure the new prop
 }) => {
   const { user: authUser } = useAuth();
   const router = useRouter();
@@ -64,7 +66,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
       <div className="p-3 border-b border-gray-800 flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-100">Chat Rooms</h2>
         <button
-          onClick={onAddRoomClick}
+          onClick={() => {
+            onAddRoomClick();
+            onSidebarItemClick(); // Call onSidebarItemClick when adding a room
+          }}
           className="p-2 rounded-full text-blue-400 hover:bg-gray-700 transition-colors cursor-pointer"
           title="Add New Room"
         >
@@ -81,7 +86,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                   ? "bg-blue-900/50 text-blue-300"
                   : "hover:bg-gray-800 text-gray-200"
               }`}
-              onClick={() => handleRoomChange(room.name)}
+              onClick={() => {
+                handleRoomChange(room.name);
+                onSidebarItemClick(); // Call onSidebarItemClick when changing room
+              }}
             >
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center flex-1 min-w-0">
@@ -121,6 +129,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                     onClick={(e) => {
                       e.stopPropagation();
                       onEditRoomClick(room);
+                      onSidebarItemClick(); // Call onSidebarItemClick when editing a room
                     }}
                     className="ml-2 p-1.5 rounded-full text-gray-300 hover:bg-gray-700 transition-colors cursor-pointer"
                     title="Edit Room"
@@ -161,11 +170,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
               <li
                 key={onlineUser.userId}
                 className="flex items-center justify-between p-2 rounded-lg"
-                onClick={() =>
+                onClick={() => {
                   navigateToUserProfile(
                     onlineUser.fullName || `${onlineUser.firstName} ${onlineUser.lastName}`
-                  )
-                }
+                  );
+                  onSidebarItemClick(); // Call onSidebarItemClick when navigating to user profile
+                }}
               >
                 <Link href={`/profile/${onlineUser.userId}`} passHref>
                   <div className="flex items-center flex-1 cursor-pointer">
@@ -195,6 +205,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                         onlineUser.userId,
                         onlineUser.fullName || `${onlineUser.firstName} ${onlineUser.lastName}`
                       );
+                      onSidebarItemClick(); // Call onSidebarItemClick when starting private chat
                     }}
                     title="Start Private Chat"
                   >
@@ -220,7 +231,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         )}
         {authUser?.role === "admin" && (
           <button
-            onClick={() => router.push("/admin/dashboard")}
+            onClick={() => {
+              router.push("/admin/dashboard");
+              onSidebarItemClick(); // Call onSidebarItemClick when navigating to admin dashboard
+            }}
             className="w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md cursor-pointer text-sm font-medium flex items-center justify-center"
           >
             Admin Dashboard
