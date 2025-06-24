@@ -103,7 +103,20 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
   const [isUpdatingRoom, setIsUpdatingRoom] = useState(false);
   const isTypingRef = useRef<boolean>(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
+
+  // New state for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const handleMenuClick = useCallback(() => {
+    setIsSidebarOpen((prev) => !prev);
+  }, []);
+
+  // New handler for sidebar item clicks to close the sidebar on mobile
+  const handleSidebarItemClick = useCallback(() => {
+    if (window.innerWidth < 768) { // Adjust breakpoint as per your Tailwind config (md: is 768px)
+      setIsSidebarOpen(false);
+    }
+  }, []);
 
   const getFileType = (mimeType: string): Message["fileType"] => {
     if (mimeType.startsWith("image/")) return "image";
@@ -800,27 +813,47 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           } are typing...`
       : "";
 
-  const handleSidebarItemClick = () => {
-    // This function can be used to close the sidebar when an item is clicked
-    setIsSidebarOpen(false);
-  };
-
   return (
     <div className="flex h-screen bg-gray-900">
+      {/* Sidebar - conditionally styled for mobile */}
       <ChatSidebar
         rooms={rooms}
         onlineUsers={onlineUsers}
         currentRoom={currentRoom}
-        handleRoomChange={handleRoomChange}
-        startPrivateConversation={startPrivateConversation}
-        navigateToUserProfile={navigateToUserProfile}
+        handleRoomChange={(roomName) => {
+          handleRoomChange(roomName);
+          handleSidebarItemClick(); // Close sidebar
+        }}
+        startPrivateConversation={(userId, fullName) => {
+          startPrivateConversation(userId, fullName);
+          handleSidebarItemClick(); // Close sidebar
+        }}
+        navigateToUserProfile={(fullName) => {
+          navigateToUserProfile(fullName);
+          handleSidebarItemClick(); // Close sidebar
+        }}
         user={user}
-        className="shadow-lg"
         onAddRoomClick={handleOnAddRoomClick}
         onEditRoomClick={handleOnEditRoomClick}
-        onSidebarItemClick={handleSidebarItemClick} // Added the missing prop
+        onSidebarItemClick={handleSidebarItemClick} // Pass the new generic handler
+        // Responsive classes for sidebar
+        className={`
+          fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 transform
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          transition-transform duration-300 ease-in-out
+          md:relative md:translate-x-0 md:flex-shrink-0 md:shadow-lg
+        `}
       />
-      <div className="flex-1 flex flex-col">
+
+      {/* Overlay for mobile when sidebar is open */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-50 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
+
+      <div className="flex-1 flex flex-col overflow-hidden">
         <ChatHeader
           chatHeaderTitle={chatHeaderTitle}
           isPrivateChat={isPrivateChat}
@@ -828,8 +861,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           logout={logout}
           goBackToRooms={() => handleRoomChange("general")}
           className="shadow-sm"
-          onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          isSidebarOpen={isSidebarOpen}
+          onMenuClick={handleMenuClick} // Pass the new handler
+          isSidebarOpen={isSidebarOpen} // Pass the state
         />
         <ChatMessages
           messages={messages}
