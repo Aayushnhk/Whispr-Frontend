@@ -1,4 +1,3 @@
-// src/app/components/chat/MessageInput.tsx
 "use client";
 
 import React, { SetStateAction, useState, useRef } from "react";
@@ -63,7 +62,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
   const [audioChunks, setAudioChunks] = useState<BlobPart[]>([]);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -100,17 +101,19 @@ const MessageInput: React.FC<MessageInputProps> = ({
         setAudioChunks((prev) => [...prev, event.data]);
       };
       recorder.onstop = () => {
-        const newAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const newAudioBlob = new Blob(audioChunks, { type: "audio/webm" });
         setAudioBlob(newAudioBlob);
         const url = URL.createObjectURL(newAudioBlob);
         setAudioUrl(url);
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
       recorder.start();
       setIsRecording(true);
       setFileUploadError(null);
     } catch (err) {
-      setFileUploadError("Could not access microphone. Please check permissions.");
+      setFileUploadError(
+        "Could not access microphone. Please check permissions."
+      );
     }
   };
 
@@ -139,25 +142,20 @@ const MessageInput: React.FC<MessageInputProps> = ({
       const response = await fetch(`${BACKEND_URL}/api/upload`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // Added Authorization header
+          Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         throw new Error(`Upload failed with status: ${response.status}`);
       }
       const result = await response.json();
-      // It seems like sendMessage is meant to send the text message,
-      // but here it's called after successful audio upload.
-      // If the intent is to send the uploaded file URL/info, sendMessage might need to be updated
-      // to accept arguments or a context that includes file details.
-      // For now, assuming sendMessage handles sending the message based on the current state.
       sendMessage();
       setAudioBlob(null);
       setAudioUrl(null);
       setAudioChunks([]);
-      setMessageInput(""); // Clear text input after sending audio
+      setMessageInput("");
     } catch (error) {
       setFileUploadError("Failed to send audio message.");
     } finally {
@@ -166,7 +164,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       setAudioUrl(null);
       setAudioChunks([]);
       if (mediaRecorder) {
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        mediaRecorder.stream.getTracks().forEach((track) => track.stop());
       }
     }
   };
@@ -189,9 +187,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           Replying to {msg.sender}
         </p>
         {msg.text && (
-          <p className="text-xs text-gray-400 mt-1 line-clamp-2">
-            {msg.text}
-          </p>
+          <p className="text-xs text-gray-400 mt-1 line-clamp-2">{msg.text}</p>
         )}
         {msg.fileUrl && msg.fileType && (
           <div className="mt-1">
@@ -224,18 +220,14 @@ const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div
-      className={`p-4 bg-gray-900 border-t border-gray-800 ${className}`}
-    >
+    <div className={`p-4 bg-gray-900 border-t border-gray-800 ${className}`}>
       {typingMessage && (
         <div className="text-gray-400 text-xs italic animate-pulse mb-3">
           {typingMessage}
         </div>
       )}
       {(fileUploadError || (audioUrl && !isRecording)) && (
-        <div className="text-red-400 text-xs mb-3">
-          {fileUploadError}
-        </div>
+        <div className="text-red-400 text-xs mb-3">{fileUploadError}</div>
       )}
       {replyingTo && (
         <div className="relative p-3 bg-gray-800/50 border-l-4 border-blue-700 mb-3 flex items-center rounded-lg">
@@ -304,7 +296,12 @@ const MessageInput: React.FC<MessageInputProps> = ({
             )
           ) : audioUrl ? (
             <div className="flex items-center space-x-2">
-              <audio controls src={audioUrl} ref={audioRef} className="w-full max-w-xs"></audio>
+              <audio
+                controls
+                src={audioUrl}
+                ref={audioRef}
+                className="w-full max-w-xs"
+              ></audio>
             </div>
           ) : null}
 
@@ -424,11 +421,15 @@ const MessageInput: React.FC<MessageInputProps> = ({
           <button
             onClick={audioBlob ? handleSendAudio : sendMessage}
             className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors cursor-pointer ${
-              (!messageInput.trim() && !selectedFile && !audioBlob)
+              !messageInput.trim() && !selectedFile && !audioBlob
                 ? "bg-blue-800 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             } text-white`}
-            disabled={(!messageInput.trim() && !selectedFile && !audioBlob) || isUploadingFile || isRecording}
+            disabled={
+              (!messageInput.trim() && !selectedFile && !audioBlob) ||
+              isUploadingFile ||
+              isRecording
+            }
           >
             <PaperAirplaneIcon className="h-4 w-4 mr-1" />
             Send

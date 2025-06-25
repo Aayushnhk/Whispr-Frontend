@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { Bars3Icon } from "@heroicons/react/24/outline"; // Import the hamburger icon
+import { Bars3Icon } from "@heroicons/react/24/outline";
 
 interface ChatHeaderProps {
   chatHeaderTitle: string;
@@ -12,8 +12,8 @@ interface ChatHeaderProps {
   logout: () => void;
   goBackToRooms: () => void;
   className?: string;
-  onMenuClick: () => void; // Added prop
-  isSidebarOpen: boolean; // Added prop
+  onMenuClick: () => void;
+  isSidebarOpen: boolean;
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -24,8 +24,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   logout,
   goBackToRooms,
   className = "",
-  onMenuClick, // Destructure the new prop
-  isSidebarOpen, // Destructure the new prop
+  onMenuClick,
+  isSidebarOpen,
 }) => {
   return (
     <header
@@ -60,9 +60,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           <>
             <span className="text-gray-300 text-sm hidden md:inline">
               Logged in as{" "}
-              <span className="font-medium text-blue-400">
-                {displayName}
-              </span>
+              <span className="font-medium text-blue-400">{displayName}</span>
             </span>
             <button
               onClick={logout}

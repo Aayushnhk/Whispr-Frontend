@@ -26,7 +26,7 @@ interface ChatSidebarProps {
   className?: string;
   onAddRoomClick: () => void;
   onEditRoomClick: (room: Room) => void;
-  onSidebarItemClick: () => void; // Added prop
+  onSidebarItemClick: () => void;
 }
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({
@@ -40,7 +40,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
   className = "",
   onAddRoomClick,
   onEditRoomClick,
-  onSidebarItemClick, // Destructure the new prop
+  onSidebarItemClick,
 }) => {
   const { user: authUser } = useAuth();
   const router = useRouter();
@@ -68,7 +68,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         <button
           onClick={() => {
             onAddRoomClick();
-            onSidebarItemClick(); // Call onSidebarItemClick when adding a room
+            onSidebarItemClick();
           }}
           className="p-2 rounded-full text-blue-400 hover:bg-gray-700 transition-colors cursor-pointer"
           title="Add New Room"
@@ -88,7 +88,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
               }`}
               onClick={() => {
                 handleRoomChange(room.name);
-                onSidebarItemClick(); // Call onSidebarItemClick when changing room
+                onSidebarItemClick();
               }}
             >
               <div className="flex items-center justify-between mb-1">
@@ -123,13 +123,12 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                 {(user.role === "admin" ||
                   (room.creator &&
                     typeof room.creator !== "string" &&
-                    (room.creator as PopulatedCreator)._id ===
-                      user.id)) && (
+                    (room.creator as PopulatedCreator)._id === user.id)) && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onEditRoomClick(room);
-                      onSidebarItemClick(); // Call onSidebarItemClick when editing a room
+                      onSidebarItemClick();
                     }}
                     className="ml-2 p-1.5 rounded-full text-gray-300 hover:bg-gray-700 transition-colors cursor-pointer"
                     title="Edit Room"
@@ -161,7 +160,9 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         </ul>
       </div>
       <div className="p-4 border-t border-gray-800">
-        <h2 className="text-lg font-semibold text-gray-100 mb-2">Online Users</h2>
+        <h2 className="text-lg font-semibold text-gray-100 mb-2">
+          Online Users
+        </h2>
         {uniqueOnlineUsers.length === 0 ? (
           <p className="text-sm text-gray-400">No users online</p>
         ) : (
@@ -172,16 +173,20 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                 className="flex items-center justify-between p-2 rounded-lg"
                 onClick={() => {
                   navigateToUserProfile(
-                    onlineUser.fullName || `${onlineUser.firstName} ${onlineUser.lastName}`
+                    onlineUser.fullName ||
+                      `${onlineUser.firstName} ${onlineUser.lastName}`
                   );
-                  onSidebarItemClick(); // Call onSidebarItemClick when navigating to user profile
+                  onSidebarItemClick();
                 }}
               >
                 <Link href={`/profile/${onlineUser.userId}`} passHref>
                   <div className="flex items-center flex-1 cursor-pointer">
                     <img
                       src={onlineUser.profilePicture || "/default-avatar.png"}
-                      alt={onlineUser.fullName || `${onlineUser.firstName} ${onlineUser.lastName}`}
+                      alt={
+                        onlineUser.fullName ||
+                        `${onlineUser.firstName} ${onlineUser.lastName}`
+                      }
                       className="w-6 h-6 rounded-full mr-2 object-cover"
                     />
                     <span className="relative flex h-2 w-2 mr-2">
@@ -189,7 +194,8 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
                     <span className="text-sm font-medium text-gray-200">
-                      {onlineUser.fullName || `${onlineUser.firstName} ${onlineUser.lastName}`}
+                      {onlineUser.fullName ||
+                        `${onlineUser.firstName} ${onlineUser.lastName}`}
                       {onlineUser.userId === user.id && (
                         <span className="text-gray-400 text-xs"> (You)</span>
                       )}
@@ -203,9 +209,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                       e.stopPropagation();
                       startPrivateConversation(
                         onlineUser.userId,
-                        onlineUser.fullName || `${onlineUser.firstName} ${onlineUser.lastName}`
+                        onlineUser.fullName ||
+                          `${onlineUser.firstName} ${onlineUser.lastName}`
                       );
-                      onSidebarItemClick(); // Call onSidebarItemClick when starting private chat
+                      onSidebarItemClick();
                     }}
                     title="Start Private Chat"
                   >
@@ -233,7 +240,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
           <button
             onClick={() => {
               router.push("/admin/dashboard");
-              onSidebarItemClick(); // Call onSidebarItemClick when navigating to admin dashboard
+              onSidebarItemClick();
             }}
             className="w-full mt-4 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md cursor-pointer text-sm font-medium flex items-center justify-center"
           >

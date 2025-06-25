@@ -1,4 +1,3 @@
-// src/app/components/chat/ChatLayout.tsx
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -65,7 +64,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     return match ? match[1] : undefined;
   })();
 
-  // Define the backend URL from environment variables
   const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
 
   const [messageInput, setMessageInput] = useState<string>("");
@@ -87,33 +85,43 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
   const [showAddRoomModal, setShowAddRoomModal] = useState(false);
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomDescription, setNewRoomDescription] = useState("");
-  const [newRoomPictureFile, setNewRoomPictureFile] = useState<File | null>(null);
-  const [newRoomPicturePreview, setNewRoomPicturePreview] = useState<string | null>(null);
+  const [newRoomPictureFile, setNewRoomPictureFile] = useState<File | null>(
+    null
+  );
+  const [newRoomPicturePreview, setNewRoomPicturePreview] = useState<
+    string | null
+  >(null);
   const newRoomFileInputRef = useRef<HTMLInputElement>(null);
-  const [roomCreationError, setRoomCreationError] = useState<string | null>(null);
+  const [roomCreationError, setRoomCreationError] = useState<string | null>(
+    null
+  );
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [showEditRoomModal, setShowEditRoomModal] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [editRoomName, setEditRoomName] = useState("");
-  const [editRoomDescription, setEditRoomDescription] = useState<string | null>("");
-  const [editRoomPictureFile, setEditRoomPictureFile] = useState<File | null>(null);
-  const [editRoomPicturePreview, setEditRoomPicturePreview] = useState<string | null>(null);
+  const [editRoomDescription, setEditRoomDescription] = useState<string | null>(
+    ""
+  );
+  const [editRoomPictureFile, setEditRoomPictureFile] = useState<File | null>(
+    null
+  );
+  const [editRoomPicturePreview, setEditRoomPicturePreview] = useState<
+    string | null
+  >(null);
   const editRoomFileInputRef = useRef<HTMLInputElement>(null);
   const [roomEditError, setRoomEditError] = useState<string | null>(null);
   const [isUpdatingRoom, setIsUpdatingRoom] = useState(false);
   const isTypingRef = useRef<boolean>(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // New state for sidebar visibility
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleMenuClick = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);
   }, []);
 
-  // New handler for sidebar item clicks to close the sidebar on mobile
   const handleSidebarItemClick = useCallback(() => {
-    if (window.innerWidth < 768) { // Adjust breakpoint as per your Tailwind config (md: is 768px)
+    if (window.innerWidth < 768) {
       setIsSidebarOpen(false);
     }
   }, []);
@@ -141,7 +149,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         return;
       }
-      // Ensure BACKEND_URL is available
       if (!BACKEND_URL) {
         console.error("Backend URL is not configured. Cannot fetch rooms.");
         return;
@@ -151,7 +158,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: "include",
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -159,9 +166,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       }
       const data: Room[] = await response.json();
       setRooms(data);
-    } catch (error: any) {
-      // Handle error, e.g., set an error state or log
-    }
+    } catch (error: any) {}
   }, [BACKEND_URL]);
 
   useEffect(() => {
@@ -246,7 +251,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         throw new Error("Authentication token not found.");
       }
-      // Ensure BACKEND_URL is available
       if (!BACKEND_URL) {
         console.error("Backend URL is not configured. Cannot add room.");
         throw new Error("Backend URL is not configured.");
@@ -262,7 +266,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: "include",
         body: formData,
       });
       if (!response.ok) {
@@ -303,14 +307,16 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         setRoomEditError("Only image files are allowed for room pictures.");
         setEditRoomPictureFile(null);
         setEditRoomPicturePreview(editingRoom?.roomPicture || null);
-        if (editRoomFileInputRef.current) editRoomFileInputRef.current.value = "";
+        if (editRoomFileInputRef.current)
+          editRoomFileInputRef.current.value = "";
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
         setRoomEditError("Room picture size cannot exceed 5MB.");
         setEditRoomPictureFile(null);
         setEditRoomPicturePreview(editingRoom?.roomPicture || null);
-        if (editRoomFileInputRef.current) editRoomFileInputRef.current.value = "";
+        if (editRoomFileInputRef.current)
+          editRoomFileInputRef.current.value = "";
         return;
       }
       setEditRoomPictureFile(file);
@@ -341,7 +347,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       if (!token) {
         throw new Error("Authentication token not found.");
       }
-      // Ensure BACKEND_URL is available
       if (!BACKEND_URL) {
         console.error("Backend URL is not configured. Cannot update room.");
         throw new Error("Backend URL is not configured.");
@@ -357,14 +362,17 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       } else if (editRoomPicturePreview === null && editingRoom.roomPicture) {
         formData.append("clearPicture", "true");
       }
-      const response = await fetch(`${BACKEND_URL}/api/rooms/${editingRoom._id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include', // Added to support credentials with CORS
-        body: formData,
-      });
+      const response = await fetch(
+        `${BACKEND_URL}/api/rooms/${editingRoom._id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+          body: formData,
+        }
+      );
       if (!response.ok) {
         const errorText = await response.text();
         try {
@@ -402,7 +410,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
     )
       return;
     if (isUploadingFile) {
-      setFileUploadError("Please wait for the current file upload to complete.");
+      setFileUploadError(
+        "Please wait for the current file upload to complete."
+      );
       return;
     }
     if (!messageInput.trim() && !selectedFile && !isProfilePictureUpload)
@@ -435,8 +445,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         ? `${receiverFirstName} ${receiverLastName}`
         : undefined,
       receiverId: isPrivateChat ? receiverIdFromUrl : undefined,
-      receiverFirstName: isPrivateChat ? receiverFirstName || undefined : undefined,
-      receiverLastName: isPrivateChat ? receiverLastName || undefined : undefined,
+      receiverFirstName: isPrivateChat
+        ? receiverFirstName || undefined
+        : undefined,
+      receiverLastName: isPrivateChat
+        ? receiverLastName || undefined
+        : undefined,
       fileUrl: selectedFile ? URL.createObjectURL(selectedFile) : undefined,
       fileType: selectedFile ? getFileType(selectedFile.type) : undefined,
       fileName: selectedFile ? selectedFile.name : undefined,
@@ -491,7 +505,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           );
         }
         const token = localStorage.getItem("token");
-        // Ensure BACKEND_URL is available
         if (!BACKEND_URL) {
           console.error("Backend URL is not configured. Cannot upload file.");
           throw new Error("Backend URL is not configured.");
@@ -501,7 +514,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          credentials: 'include', // Added to support credentials with CORS
+          credentials: "include",
           body: formData,
         });
         if (!response.ok) {
@@ -734,7 +747,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
   const handleContextMenu = (e: React.MouseEvent, msg: Message) => {
     if (msg.senderId === user.id) {
       e.preventDefault();
-      const messageElement = e.currentTarget.closest(".message-container") as HTMLElement;
+      const messageElement = e.currentTarget.closest(
+        ".message-container"
+      ) as HTMLElement;
       if (!messageElement) return;
       const containerRect = messageElement.getBoundingClientRect();
       const x = e.clientX - containerRect.left;
@@ -793,7 +808,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
       messageId: null,
       position: { x: 0, y: 0 },
     });
-    const inputElement = document.querySelector('input[placeholder="Type your message..."]') as HTMLInputElement;
+    const inputElement = document.querySelector(
+      'input[placeholder="Type your message..."]'
+    ) as HTMLInputElement;
     if (inputElement) inputElement.focus();
   };
 
@@ -815,28 +832,26 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
 
   return (
     <div className="flex h-screen bg-gray-900">
-      {/* Sidebar - conditionally styled for mobile */}
       <ChatSidebar
         rooms={rooms}
         onlineUsers={onlineUsers}
         currentRoom={currentRoom}
         handleRoomChange={(roomName) => {
           handleRoomChange(roomName);
-          handleSidebarItemClick(); // Close sidebar
+          handleSidebarItemClick();
         }}
         startPrivateConversation={(userId, fullName) => {
           startPrivateConversation(userId, fullName);
-          handleSidebarItemClick(); // Close sidebar
+          handleSidebarItemClick();
         }}
         navigateToUserProfile={(fullName) => {
           navigateToUserProfile(fullName);
-          handleSidebarItemClick(); // Close sidebar
+          handleSidebarItemClick();
         }}
         user={user}
         onAddRoomClick={handleOnAddRoomClick}
         onEditRoomClick={handleOnEditRoomClick}
-        onSidebarItemClick={handleSidebarItemClick} // Pass the new generic handler
-        // Responsive classes for sidebar
+        onSidebarItemClick={handleSidebarItemClick}
         className={`
           fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 transform
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
@@ -844,15 +859,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           md:relative md:translate-x-0 md:flex-shrink-0 md:shadow-lg
         `}
       />
-
-      {/* Overlay for mobile when sidebar is open */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black opacity-50 z-40 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
-
       <div className="flex-1 flex flex-col overflow-hidden">
         <ChatHeader
           chatHeaderTitle={chatHeaderTitle}
@@ -861,8 +873,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           logout={logout}
           goBackToRooms={() => handleRoomChange("general")}
           className="shadow-sm"
-          onMenuClick={handleMenuClick} // Pass the new handler
-          isSidebarOpen={isSidebarOpen} // Pass the state
+          onMenuClick={handleMenuClick}
+          isSidebarOpen={isSidebarOpen}
         />
         <ChatMessages
           messages={messages}
@@ -903,7 +915,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           className="shadow-sm"
         />
       </div>
-
       {showAddRoomModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-300 ease-out">
           <div className="bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-sm relative transform scale-100 transition-all duration-300 ease-out border border-gray-800">
@@ -1029,7 +1040,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
           </div>
         </div>
       )}
-
       {showEditRoomModal && editingRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-300 ease-out">
           <div className="bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-sm relative transform scale-100 transition-all duration-300 ease-out border border-gray-800">
@@ -1080,7 +1090,9 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
                 </label>
                 <textarea
                   id="editRoomDescription"
-                  value={editRoomDescription !== null ? editRoomDescription : ""}
+                  value={
+                    editRoomDescription !== null ? editRoomDescription : ""
+                  }
                   onChange={(e) => setEditRoomDescription(e.target.value)}
                   className="w-full p-2.5 border border-gray-800 rounded-lg bg-gray-800 text-gray-100 focus:ring-blue-500 focus:border-blue-500 resize-y outline-none transition-all"
                   placeholder="A brief description of the room..."
@@ -1135,7 +1147,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
                 )}
                 {!editRoomPicturePreview && editingRoom.roomPicture && (
                   <p className="text-xs text-gray-400 mt-2">
-                    No picture selected. Current: <span className="font-semibold">Default or existing</span>
+                    No picture selected. Current:{" "}
+                    <span className="font-semibold">Default or existing</span>
                   </p>
                 )}
               </div>

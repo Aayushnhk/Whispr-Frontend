@@ -7,7 +7,7 @@ export default function HomePage() {
         {/* Animated background elements */}
         <div className="absolute -top-20 -left-20 w-40 h-40 bg-blue-500/10 rounded-full filter blur-xl animate-float-slow"></div>
         <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-cyan-400/10 rounded-full filter blur-xl animate-float-slower"></div>
-        
+
         <div className="relative z-10 flex flex-col items-center">
           {/* Logo with better animation */}
           <div className="mb-6 w-24 h-24 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-400/20 p-4 shadow-inner shadow-black/30 group-hover:shadow-blue-500/20 transition-all duration-500">
@@ -26,18 +26,18 @@ export default function HomePage() {
             </svg>
           </div>
 
-          {/* Headline with better gradient */}
+          {/* Headline */}
           <h1 className="text-4xl font-extrabold tracking-tight mb-3">
             <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent bg-size-200 animate-gradient">
               Welcome to Whispr
             </span>
           </h1>
-          
+
           <p className="text-gray-300/90 text-lg mb-8 text-center leading-relaxed">
-            Secure, real-time messaging with end-to-end encryption and seamless collaboration
+            Secure, real-time messaging with end-to-end encryption and seamless
+            collaboration
           </p>
 
-          {/* Buttons with improved styling */}
           <div className="w-full space-y-4">
             <Link href="/login" passHref>
               <button className="w-full relative overflow-hidden px-6 py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-blue-500/30 transition-all duration-300 group/button cursor-pointer">
@@ -92,7 +92,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Footer text with better animation */}
+          {/* Footer */}
           <p className="text-gray-400/80 text-sm mt-8 text-center leading-snug">
             <span className="inline-block transition-all duration-300 hover:text-blue-300 hover:scale-105 cursor-default">
               Join thousands of users in secure, real-time conversations

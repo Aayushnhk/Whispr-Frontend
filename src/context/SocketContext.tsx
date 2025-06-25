@@ -1,6 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useRef,
+} from "react";
 import io from "socket.io-client";
 import { useAuth } from "./AuthContext";
 import { OnlineUser } from "@/types";
@@ -154,7 +161,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
       socket.io.on("reconnect", handleReconnect);
       socket.on("onlineUsers", handleOnlineUsers);
       socket.on("disconnect", handleDisconnect);
-      socket.on("connect_error", (error: Error) => { // Explicitly type 'error' as Error
+      socket.on("connect_error", (error: Error) => {
         console.error("Socket connect_error:", error.message, error.stack);
         if (
           error.message.includes("Authentication error") ||

@@ -1,7 +1,10 @@
-// src/app/components/chat/ContextMenu.tsx
 import React from "react";
 import type { ContextMenu } from "@/types";
-import { PencilSquareIcon, TrashIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
+import {
+  PencilSquareIcon,
+  TrashIcon,
+  ArrowUturnLeftIcon,
+} from "@heroicons/react/24/solid";
 
 interface ContextMenuProps {
   contextMenu: ContextMenu;
@@ -35,9 +38,13 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       <button
         onClick={() => {
           handleEdit();
-          setContextMenu({ visible: false, messageId: null, position: { x: 0, y: 0 } });
+          setContextMenu({
+            visible: false,
+            messageId: null,
+            position: { x: 0, y: 0 },
+          });
         }}
-        className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-800 flex items-center"
+        className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-800 flex items-center cursor-pointer"
       >
         <PencilSquareIcon className="w-4 h-4 mr-2" />
         Edit
@@ -45,9 +52,13 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       <button
         onClick={() => {
           handleDelete();
-          setContextMenu({ visible: false, messageId: null, position: { x: 0, y: 0 } });
+          setContextMenu({
+            visible: false,
+            messageId: null,
+            position: { x: 0, y: 0 },
+          });
         }}
-        className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-800 flex items-center"
+        className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-800 flex items-center cursor-pointer"
       >
         <TrashIcon className="w-4 h-4 mr-2" />
         Delete
@@ -55,9 +66,13 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       <button
         onClick={() => {
           handleReply();
-          setContextMenu({ visible: false, messageId: null, position: { x: 0, y: 0 } });
+          setContextMenu({
+            visible: false,
+            messageId: null,
+            position: { x: 0, y: 0 },
+          });
         }}
-        className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-800 flex items-center"
+        className="w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-800 flex items-center cursor-pointer"
       >
         <ArrowUturnLeftIcon className="w-4 h-4 mr-2" />
         Reply
