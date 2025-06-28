@@ -1,4 +1,3 @@
-// src/app/components/chat/ChatMessages.tsx
 "use client";
 
 import React, { useCallback } from "react";
@@ -209,11 +208,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                   );
                 }
               } catch (e) {
-                return (
-                  <p className="text-sm text-gray-200">
-                    {msg.text}
-                  </p>
-                );
+                return <p className="text-sm text-gray-200">{msg.text}</p>;
               }
             })()
           ) : (
@@ -240,10 +235,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           <React.Fragment key={msg._id || msg.id}>
             {showDateSeparator && (
               <div className="relative my-4 flex items-center justify-center">
-                <span className="absolute z-10 px-3 py-1 text-xs text-gray-300 bg-gray-800 rounded-lg shadow-md">
+                <div className="w-full border-t border-gray-700 absolute top-1/2 -translate-y-1/2 left-0 right-0 z-0"></div>
+                <span className="relative z-10 px-3 py-1 text-xs text-gray-300 bg-gray-800 rounded-lg shadow-md">
                   {messageDate}
                 </span>
-                <div className="w-full border-t border-gray-700 absolute top-1/2 -translate-y-1/2"></div>
               </div>
             )}
             <div
