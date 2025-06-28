@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
+import io from "socket.io-client";
 
 interface UserData {
   _id: string;
@@ -15,6 +16,12 @@ interface UserData {
   banned: boolean;
 }
 
+interface OnlineUser {
+  userId: string;
+  fullName: string;
+  profilePicture: string;
+}
+
 export default function AdminDashboardPage() {
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const router = useRouter();
@@ -22,6 +29,7 @@ export default function AdminDashboardPage() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
 
   const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
 
@@ -70,16 +78,40 @@ export default function AdminDashboardPage() {
   }, [logout, router, BACKEND_URL]);
 
   useEffect(() => {
-    if (!authLoading) {
-      if (!isAuthenticated) {
-        router.replace("/login");
-      } else if (user?.role !== "admin") {
-        router.replace("/chat");
-      } else {
-        fetchUsers();
-      }
+    let socket: ReturnType<typeof io> | undefined;
+
+    if (!authLoading && isAuthenticated && user?.role === "admin" && BACKEND_URL) {
+      socket = io(BACKEND_URL, {
+        transports: ["websocket", "polling"],
+      });
+
+      socket.on("connect", () => {
+        if (user) {
+          socket?.emit("registerUser", user.id, user.firstName, user.lastName, user.profilePicture);
+        }
+      });
+
+      socket.on("onlineUsers", (onlineUsersArray: OnlineUser[]) => {
+        const newOnlineIds = new Set(onlineUsersArray.map(u => u.userId));
+        setOnlineUserIds(newOnlineIds);
+      });
+
+      socket.on("disconnect", () => {
+        setOnlineUserIds(new Set());
+      });
+
+      socket.on("error", (message: string) => {
+      });
+
+      fetchUsers();
     }
-  }, [isAuthenticated, authLoading, user, router, fetchUsers]);
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [isAuthenticated, authLoading, user, router, fetchUsers, BACKEND_URL]);
 
   const handleChangeRole = async (
     userId: string,
@@ -265,81 +297,86 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
-                {users.map((u) => (
-                  <tr
-                    key={u._id}
-                    className="hover:bg-gray-700/50 transition-colors"
-                  >
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 relative overflow-hidden rounded-full border-2 border-blue-400">
-                          <Image
-                            src={u.profilePicture || "/default-avatar.png"}
-                            alt={`${u.firstName || "User"}'s profile`}
-                            fill
-                            style={{ objectFit: "cover" }}
-                            sizes="40px"
-                            className="pointer-events-none"
-                          />
+                {users.map((u) => {
+                  const isOnline = onlineUserIds.has(u._id);
+                  return (
+                    <tr
+                      key={u._id}
+                      className="hover:bg-gray-700/50 transition-colors"
+                    >
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 relative overflow-hidden rounded-full border-2 border-blue-400">
+                            <Image
+                              src={u.profilePicture || "/default-avatar.png"}
+                              alt={`${u.firstName || "User"}'s profile`}
+                              fill
+                              style={{ objectFit: "cover" }}
+                              sizes="40px"
+                              className="pointer-events-none"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-100">
-                        {`${u.firstName || ""} ${u.lastName || ""}`.trim() ||
-                          "N/A"}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          u.role === "admin"
-                            ? "bg-purple-600 text-gray-100"
-                            : "bg-blue-600 text-gray-100"
-                        }`}
-                      >
-                        {u.role}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          u.banned
-                            ? "bg-red-600 text-gray-100"
-                            : "bg-green-600 text-gray-100"
-                        }`}
-                      >
-                        {u.banned ? "Banned" : "Active"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      {user?.id !== u._id && (
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleChangeRole(u._id, u.role)}
-                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
-                              u.role === "admin"
-                                ? "bg-yellow-600 hover:bg-yellow-700 text-gray-100"
-                                : "bg-blue-600 hover:bg-blue-700 text-gray-100"
-                            }`}
-                          >
-                            {u.role === "admin" ? "Demote" : "Promote"}
-                          </button>
-                          <button
-                            onClick={() => handleBanToggle(u._id, u.banned)}
-                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
-                              u.banned
-                                ? "bg-green-600 hover:bg-green-700 text-gray-100"
-                                : "bg-red-600 hover:bg-red-700 text-gray-100"
-                            }`}
-                          >
-                            {u.banned ? "Unban" : "Ban"}
-                          </button>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-100">
+                          {`${u.firstName || ""} ${u.lastName || ""}`.trim() ||
+                            "N/A"}
                         </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            u.role === "admin"
+                              ? "bg-purple-600 text-gray-100"
+                              : "bg-blue-600 text-gray-100"
+                          }`}
+                        >
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            u.banned
+                              ? "bg-red-600 text-gray-100"
+                              : isOnline
+                              ? "bg-green-600 text-gray-100"
+                              : "bg-gray-500 text-gray-100"
+                          }`}
+                        >
+                          {u.banned ? "Banned" : (isOnline ? "Online" : "Offline")}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {user?.id !== u._id && (
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleChangeRole(u._id, u.role)}
+                              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
+                                u.role === "admin"
+                                  ? "bg-yellow-600 hover:bg-yellow-700 text-gray-100"
+                                  : "bg-blue-600 hover:bg-blue-700 text-gray-100"
+                              }`}
+                            >
+                              {u.role === "admin" ? "Demote" : "Promote"}
+                            </button>
+                            <button
+                              onClick={() => handleBanToggle(u._id, u.banned)}
+                              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
+                                u.banned
+                                  ? "bg-green-600 hover:bg-green-700 text-gray-100"
+                                  : "bg-red-600 hover:bg-red-700 text-gray-100"
+                              }`}
+                            >
+                              {u.banned ? "Unban" : "Ban"}
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
