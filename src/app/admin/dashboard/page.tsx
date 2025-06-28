@@ -1,4 +1,3 @@
-// app/admin/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -24,8 +23,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
 
-  // Define the backend URL from environment variables
-  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || ""; // Using NEXT_PUBLIC_URL as per your Vercel setup
+  const BACKEND_URL = process.env.NEXT_PUBLIC_URL || "";
 
   const fetchUsers = useCallback(async () => {
     setLoadingUsers(true);
@@ -38,7 +36,6 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      // Check if backend URL is available
       if (!BACKEND_URL) {
         setError("Backend URL is not configured. Please check environment variables.");
         setLoadingUsers(false);
@@ -49,7 +46,7 @@ export default function AdminDashboardPage() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: 'include',
       });
 
       if (response.status === 401) {
@@ -106,7 +103,6 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      // Check if backend URL is available
       if (!BACKEND_URL) {
         setError("Backend URL is not configured. Please check environment variables.");
         return;
@@ -118,7 +114,7 @@ export default function AdminDashboardPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: 'include',
         body: JSON.stringify({ userId, role: newRole }),
       });
 
@@ -159,7 +155,6 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      // Check if backend URL is available
       if (!BACKEND_URL) {
         setError("Backend URL is not configured. Please check environment variables.");
         return;
@@ -171,7 +166,7 @@ export default function AdminDashboardPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Added to support credentials with CORS
+        credentials: 'include',
         body: JSON.stringify({ userId, bannedStatus: newBannedStatus }),
       });
 
@@ -259,9 +254,6 @@ export default function AdminDashboardPage() {
                     Username
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                     Role
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
@@ -297,9 +289,6 @@ export default function AdminDashboardPage() {
                         {`${u.firstName || ""} ${u.lastName || ""}`.trim() ||
                           "N/A"}
                       </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-300">{u.email}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
