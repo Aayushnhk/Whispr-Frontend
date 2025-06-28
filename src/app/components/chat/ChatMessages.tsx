@@ -234,9 +234,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         return (
           <React.Fragment key={msg._id || msg.id}>
             {showDateSeparator && (
-              <div className="relative my-4 flex items-center justify-center">
-                <div className="w-full border-t border-gray-700 absolute top-1/2 -translate-y-1/2 left-0 right-0 z-0"></div>
-                <span className="relative z-10 px-3 py-1 text-xs text-gray-300 bg-gray-800 rounded-lg shadow-md">
+              <div className="my-4 text-center">
+                <span className="inline-block px-3 py-1 text-xs font-medium text-gray-300 bg-gray-800 rounded-lg shadow-md">
                   {messageDate}
                 </span>
               </div>
