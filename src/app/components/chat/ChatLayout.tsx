@@ -165,7 +165,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({
         throw new Error(errorData.message || "Failed to fetch rooms");
       }
       const data: Room[] = await response.json();
-      setRooms(data);
+      const filteredData = data.filter((room) => room.name !== "General");
+      setRooms(filteredData);
     } catch (error: any) {}
   }, [BACKEND_URL]);
 
