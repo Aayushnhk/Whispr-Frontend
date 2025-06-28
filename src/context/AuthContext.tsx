@@ -177,7 +177,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } catch (error) {
         clearAuthData();
-        if (pathname !== "/login" && pathname !== "/") {
+
+        if (
+          pathname !== "/login" &&
+          pathname !== "/register" &&
+          pathname !== "/"
+        ) {
           router.replace("/login");
         }
       } finally {
