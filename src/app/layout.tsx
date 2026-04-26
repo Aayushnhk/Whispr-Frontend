@@ -1,8 +1,5 @@
 "use client";
 
-declare module "*.css";
-
-import "./globals.css";
 import { Inter } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { GlobalSocketManager } from "@/context/SocketContext";
