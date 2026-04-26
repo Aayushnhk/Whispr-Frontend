@@ -44,15 +44,15 @@ export default function LoginPage() {
         setError(data.message || "Login failed");
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
 
   if (authLoading) return (
-    <div style={{ background: "#080809", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: "28px", height: "28px", border: "1px solid rgba(255,255,255,0.15)", borderTopColor: "#e8e4dc", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+    <div style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: "28px", height: "28px", border: "2px solid var(--border)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
@@ -60,89 +60,79 @@ export default function LoginPage() {
   if (isAuthenticated) return null;
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0f0f10",
-    border: "1px solid rgba(255,255,255,0.08)",
-    padding: "0.85rem 1rem", color: "#e8e4dc",
-    fontFamily: "system-ui,sans-serif", fontSize: "0.88rem",
-    outline: "none", boxSizing: "border-box",
+    width: "100%", background: "var(--surface2)",
+    border: "1px solid var(--border-subtle)",
+    padding: "0.75rem 1rem", color: "var(--text)",
+    fontFamily: "inherit", fontSize: "0.9rem",
+    outline: "none", borderRadius: "8px", boxSizing: "border-box",
+    transition: "border-color 0.2s",
   };
 
   return (
-    <main style={{ background: "#080809", minHeight: "100vh", color: "#e8e4dc", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
+    <main style={{ background: "var(--bg)", minHeight: "100vh", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+      <div style={{ width: "100%", maxWidth: "420px" }}>
 
-      {/* Left — form */}
-      <div style={{ padding: "clamp(3rem,8vw,6rem) clamp(1.5rem,5vw,4rem)", display: "flex", flexDirection: "column", justifyContent: "center", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
-        <Link href="/" style={{ fontFamily: "Georgia,serif", fontSize: "1.1rem", color: "#e8e4dc", textDecoration: "none", display: "inline-block", marginBottom: "3rem" }}>
-          Whispr
+        {/* Logo */}
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", marginBottom: "2.5rem", justifyContent: "center" }}>
+          <div style={{ width: "32px", height: "32px", background: "var(--accent)", borderRadius: "9px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+          </div>
+          <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--text)" }}>Whispr</span>
         </Link>
 
-        <div style={{ maxWidth: "360px", width: "100%" }}>
-          <div style={{ fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#6b6860", marginBottom: "0.8rem" }}>
-            welcome back
-          </div>
-          <h1 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(1.8rem,3vw,2.4rem)", fontWeight: 400, marginBottom: "2.5rem", lineHeight: 1.15 }}>
-            Sign in to<br />your account
+        {/* Card */}
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border-subtle)", borderRadius: "16px", padding: "2rem" }}>
+          <h1 style={{ fontWeight: 700, fontSize: "1.5rem", letterSpacing: "-0.02em", marginBottom: "0.4rem" }}>
+            Welcome back
           </h1>
+          <p style={{ color: "var(--muted)", fontSize: "0.88rem", marginBottom: "1.8rem" }}>
+            Sign in to continue to Whispr
+          </p>
 
           {error && (
-            <div style={{ fontFamily: "system-ui,sans-serif", fontSize: "0.78rem", color: "#f87171", marginBottom: "1.2rem", paddingLeft: "1rem", borderLeft: "2px solid #f87171" }}>
+            <div style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.3)", borderRadius: "8px", padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#f87171", marginBottom: "1.2rem" }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div>
-              <label style={{ fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#6b6860", display: "block", marginBottom: "0.4rem" }}>email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} placeholder="your@email.com" style={inputStyle} />
+              <label style={{ fontSize: "0.78rem", fontWeight: 500, color: "var(--muted)", display: "block", marginBottom: "0.4rem" }}>Email address</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} placeholder="you@example.com" style={inputStyle} />
             </div>
 
             <div>
-              <label style={{ fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#6b6860", display: "block", marginBottom: "0.4rem" }}>password</label>
+              <label style={{ fontSize: "0.78rem", fontWeight: 500, color: "var(--muted)", display: "block", marginBottom: "0.4rem" }}>Password</label>
               <div style={{ position: "relative" }}>
-                <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={loading} placeholder="••••••••" style={{ ...inputStyle, paddingRight: "3rem" }} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6b6860", cursor: "pointer", fontSize: "0.75rem", letterSpacing: "0.06em" }}>
-                  {showPassword ? "hide" : "show"}
+                <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={loading} placeholder="••••••••" style={{ ...inputStyle, paddingRight: "3.5rem" }} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "0.75rem", fontWeight: 500 }}>
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
             </div>
 
             <button type="submit" disabled={loading} style={{
-              background: "#e8e4dc", color: "#080809",
-              fontFamily: "system-ui,sans-serif", fontSize: "0.75rem",
-              letterSpacing: "0.1em", textTransform: "uppercase",
-              fontWeight: 500, padding: "0.9rem",
+              width: "100%", background: "var(--accent)", color: "#fff",
+              fontWeight: 600, fontSize: "0.9rem",
+              padding: "0.8rem", borderRadius: "8px",
               border: "none", cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.6 : 1, marginTop: "0.5rem",
+              opacity: loading ? 0.7 : 1, marginTop: "0.5rem",
+              boxShadow: "0 0 20px rgba(99,102,241,0.25)",
             }}>
-              {loading ? "signing in..." : "sign in"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
-          <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
-            <Link href="/register" style={{ fontFamily: "system-ui,sans-serif", fontSize: "0.78rem", color: "#6b6860", textDecoration: "none" }}>
-              don't have an account? sign up →
+          <div style={{ textAlign: "center", marginTop: "1.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>
+            Don't have an account?{" "}
+            <Link href="/register" style={{ color: "var(--accent-light)", textDecoration: "none", fontWeight: 500 }}>
+              Sign up free
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Right — feature list */}
-      <div style={{ padding: "clamp(3rem,8vw,6rem) clamp(1.5rem,5vw,4rem)", display: "flex", flexDirection: "column", justifyContent: "center", gap: "2rem" }} className="login-right">
-        {[
-          { title: "Public & private rooms", desc: "Jump into topic rooms or start a private conversation with anyone online." },
-          { title: "Real-time everything", desc: "Messages, typing indicators, presence, file uploads — all instant." },
-          { title: "Media & file sharing", desc: "Send images, videos, documents up to 25MB directly in chat." },
-        ].map((f, i) => (
-          <div key={i} style={{ paddingLeft: "1.5rem", borderLeft: "1px solid rgba(255,255,255,0.08)" }}>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: "0.95rem", color: "#e8e4dc", marginBottom: "0.4rem" }}>{f.title}</div>
-            <div style={{ fontSize: "0.78rem", color: "#6b6860", lineHeight: 1.6 }}>{f.desc}</div>
-          </div>
-        ))}
-      </div>
-
-      <style>{`
-        @media (max-width: 640px) { .login-right { display: none !important; } }
-      `}</style>
     </main>
   );
 }

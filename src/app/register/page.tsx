@@ -50,43 +50,48 @@ export default function RegisterPage() {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "#0f0f10",
-    border: "1px solid rgba(255,255,255,0.08)",
-    padding: "0.85rem 1rem", color: "#e8e4dc",
-    fontFamily: "system-ui,sans-serif", fontSize: "0.88rem",
-    outline: "none", boxSizing: "border-box",
+    width: "100%", background: "var(--surface2)",
+    border: "1px solid var(--border-subtle)",
+    padding: "0.75rem 1rem", color: "var(--text)",
+    fontFamily: "inherit", fontSize: "0.9rem",
+    outline: "none", borderRadius: "8px", boxSizing: "border-box",
   };
 
   const labelStyle: React.CSSProperties = {
-    fontSize: "0.68rem", letterSpacing: "0.1em",
-    textTransform: "uppercase", color: "#6b6860",
-    display: "block", marginBottom: "0.4rem",
+    fontSize: "0.78rem", fontWeight: 500,
+    color: "var(--muted)", display: "block", marginBottom: "0.4rem",
   };
 
   return (
-    <main style={{ background: "#080809", minHeight: "100vh", color: "#e8e4dc", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
+    <main style={{ background: "var(--bg)", minHeight: "100vh", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+      <div style={{ width: "100%", maxWidth: "440px" }}>
 
-      {/* Left — form */}
-      <div style={{ padding: "clamp(3rem,8vw,6rem) clamp(1.5rem,5vw,4rem)", display: "flex", flexDirection: "column", justifyContent: "center", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
-        <Link href="/" style={{ fontFamily: "Georgia,serif", fontSize: "1.1rem", color: "#e8e4dc", textDecoration: "none", display: "inline-block", marginBottom: "3rem" }}>
-          Whispr
+        {/* Logo */}
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", marginBottom: "2.5rem", justifyContent: "center" }}>
+          <div style={{ width: "32px", height: "32px", background: "var(--accent)", borderRadius: "9px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+          </div>
+          <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--text)" }}>Whispr</span>
         </Link>
 
-        <div style={{ maxWidth: "360px", width: "100%" }}>
-          <div style={{ fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#6b6860", marginBottom: "0.8rem" }}>
-            get started
-          </div>
-          <h1 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(1.8rem,3vw,2.4rem)", fontWeight: 400, marginBottom: "2.5rem", lineHeight: 1.15 }}>
-            Create your<br />account
+        {/* Card */}
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border-subtle)", borderRadius: "16px", padding: "2rem" }}>
+          <h1 style={{ fontWeight: 700, fontSize: "1.5rem", letterSpacing: "-0.02em", marginBottom: "0.4rem" }}>
+            Create your account
           </h1>
+          <p style={{ color: "var(--muted)", fontSize: "0.88rem", marginBottom: "1.8rem" }}>
+            Join Whispr and start chatting instantly
+          </p>
 
           {error && (
-            <div style={{ fontFamily: "system-ui,sans-serif", fontSize: "0.78rem", color: "#f87171", marginBottom: "1.2rem", paddingLeft: "1rem", borderLeft: "2px solid #f87171" }}>
+            <div style={{ background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.3)", borderRadius: "8px", padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#f87171", marginBottom: "1.2rem" }}>
               {error}
             </div>
           )}
           {success && (
-            <div style={{ fontFamily: "system-ui,sans-serif", fontSize: "0.78rem", color: "#4caf86", marginBottom: "1.2rem", paddingLeft: "1rem", borderLeft: "2px solid #4caf86" }}>
+            <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: "8px", padding: "0.75rem 1rem", fontSize: "0.82rem", color: "#10b981", marginBottom: "1.2rem" }}>
               {success}
             </div>
           )}
@@ -94,78 +99,64 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
               <div>
-                <label style={labelStyle}>first name</label>
+                <label style={labelStyle}>First name</label>
                 <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={loading} placeholder="Aayush" style={inputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>last name</label>
+                <label style={labelStyle}>Last name</label>
                 <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={loading} placeholder="Sharma" style={inputStyle} />
               </div>
             </div>
 
             <div>
-              <label style={labelStyle}>email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} placeholder="your@email.com" style={inputStyle} />
+              <label style={labelStyle}>Email address</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={loading} placeholder="you@example.com" style={inputStyle} />
             </div>
 
             <div>
-              <label style={labelStyle}>password</label>
+              <label style={labelStyle}>Password</label>
               <div style={{ position: "relative" }}>
-                <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={loading} placeholder="8+ chars, uppercase, number, symbol" style={{ ...inputStyle, paddingRight: "3rem" }} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6b6860", cursor: "pointer", fontSize: "0.75rem", letterSpacing: "0.06em" }}>
-                  {showPassword ? "hide" : "show"}
+                <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required disabled={loading} placeholder="Min 8 chars, uppercase, number, symbol" style={{ ...inputStyle, paddingRight: "3.5rem" }} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "0.75rem", fontWeight: 500 }}>
+                  {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
               {password && !validatePassword(password) && (
-                <div style={{ fontSize: "0.7rem", color: "#f87171", marginTop: "0.4rem" }}>
-                  needs uppercase, lowercase, number and special character
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.5rem" }}>
+                  {[
+                    { label: "8+ chars", ok: password.length >= 8 },
+                    { label: "Uppercase", ok: /[A-Z]/.test(password) },
+                    { label: "Number", ok: /[0-9]/.test(password) },
+                    { label: "Symbol", ok: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
+                  ].map(r => (
+                    <span key={r.label} style={{ fontSize: "0.7rem", padding: "0.15rem 0.5rem", borderRadius: "4px", background: r.ok ? "rgba(16,185,129,0.1)" : "rgba(244,63,94,0.1)", color: r.ok ? "#10b981" : "#f87171", border: `1px solid ${r.ok ? "rgba(16,185,129,0.2)" : "rgba(244,63,94,0.2)"}` }}>
+                      {r.ok ? "✓" : "✗"} {r.label}
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
 
             <button type="submit" disabled={loading} style={{
-              background: "#e8e4dc", color: "#080809",
-              fontFamily: "system-ui,sans-serif", fontSize: "0.75rem",
-              letterSpacing: "0.1em", textTransform: "uppercase",
-              fontWeight: 500, padding: "0.9rem",
+              width: "100%", background: "var(--accent)", color: "#fff",
+              fontWeight: 600, fontSize: "0.9rem",
+              padding: "0.8rem", borderRadius: "8px",
               border: "none", cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.6 : 1, marginTop: "0.5rem",
+              opacity: loading ? 0.7 : 1, marginTop: "0.5rem",
+              boxShadow: "0 0 20px rgba(99,102,241,0.25)",
             }}>
-              {loading ? "creating account..." : "create account"}
+              {loading ? "Creating account..." : "Create account"}
             </button>
           </form>
 
-          <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
-            <Link href="/login" style={{ fontFamily: "system-ui,sans-serif", fontSize: "0.78rem", color: "#6b6860", textDecoration: "none" }}>
-              already have an account? sign in →
+          <div style={{ textAlign: "center", marginTop: "1.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>
+            Already have an account?{" "}
+            <Link href="/login" style={{ color: "var(--accent-light)", textDecoration: "none", fontWeight: 500 }}>
+              Sign in
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Right */}
-      <div style={{ padding: "clamp(3rem,8vw,6rem) clamp(1.5rem,5vw,4rem)", display: "flex", flexDirection: "column", justifyContent: "center", gap: "0" }} className="register-right">
-        <div style={{ fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#6b6860", marginBottom: "2rem" }}>
-          what you get
-        </div>
-        {[
-          "Instant public and private messaging",
-          "File and media sharing up to 25MB",
-          "Real-time typing indicators and presence",
-          "Create and manage your own chat rooms",
-          "Admin controls and moderation tools",
-          "Profile customization with avatar upload",
-        ].map((item, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.9rem 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-            <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#e8e4dc", flexShrink: 0 }} />
-            <span style={{ fontSize: "0.82rem", color: "#a8a49e" }}>{item}</span>
-          </div>
-        ))}
-      </div>
-
-      <style>{`
-        @media (max-width: 640px) { .register-right { display: none !important; } }
-      `}</style>
     </main>
   );
 }
