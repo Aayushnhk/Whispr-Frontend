@@ -48,7 +48,7 @@ export default function HomePage() {
             </svg>
           </div>
           <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)" }}>
-            Whispr
+            kinetic
           </span>
         </div>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
@@ -220,7 +220,7 @@ export default function HomePage() {
       <footer style={{ borderTop: "1px solid var(--border-subtle)", padding: "2rem clamp(1.5rem,5vw,4rem)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ width: "20px", height: "20px", background: "var(--accent)", borderRadius: "5px" }} />
-          <span style={{ fontWeight: 700, fontSize: "0.88rem" }}>Whispr</span>
+          <span style={{ fontWeight: 700, fontSize: "0.88rem" }}>kinetic</span>
         </div>
         <span style={{ fontSize: "0.78rem", color: "var(--muted)" }}>Real-time chat · Built with Next.js & WebSockets</span>
       </footer>

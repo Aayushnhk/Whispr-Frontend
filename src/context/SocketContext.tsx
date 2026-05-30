@@ -40,7 +40,7 @@ export const GlobalSocketManager: React.FC<GlobalSocketManagerProps> = ({
 
   const socketUrl =
     process.env.NEXT_PUBLIC_SOCKET_URL ||
-    "https://whispr-backend-sarl.onrender.com";
+    "https://kinetic-backend-sarl.onrender.com";
 
   useEffect(() => {
     if (
