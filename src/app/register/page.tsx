@@ -100,11 +100,11 @@ export default function RegisterPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
               <div>
                 <label style={labelStyle}>First name</label>
-                <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={loading} placeholder="Aayush" style={inputStyle} />
+                <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required disabled={loading} placeholder="first name" style={inputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>Last name</label>
-                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={loading} placeholder="Sharma" style={inputStyle} />
+                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} required disabled={loading} placeholder="last name" style={inputStyle} />
               </div>
             </div>
 
