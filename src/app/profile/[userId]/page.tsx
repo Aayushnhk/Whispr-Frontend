@@ -175,7 +175,7 @@ export default function UnifiedUserProfilePage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          folder: "kinetic_profile_pictures",
+          folder: "Kinetic_profile_pictures",
           upload_preset: CLOUDINARY_UPLOAD_PRESET,
           resource_type: selectedFile.type.startsWith("image/") ? "image" : "raw", // Ensure correct resource type
         }),
